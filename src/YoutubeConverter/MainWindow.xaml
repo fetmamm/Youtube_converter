@@ -59,10 +59,6 @@
                                       VerticalAlignment="Center"
                                       Margin="8,0,0,0" />
                     </StackPanel>
-                    <ui:TextBlock Text="Klistra in eller dra en YouTube-länk och välj format."
-                                  FontTypography="Body"
-                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                  Margin="0,2,0,0" />
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
@@ -89,7 +85,12 @@
                     <ui:Button x:Name="ContactButton"
                                Icon="{ui:SymbolIcon Symbol=Mail24}"
                                ToolTip="Kontakt"
+                               Margin="0,0,8,0"
                                Click="ContactButton_Click" />
+                    <ui:Button x:Name="InfoButton"
+                               Icon="{ui:SymbolIcon Symbol=Info24}"
+                               ToolTip="Information"
+                               Click="InfoButton_Click" />
                 </StackPanel>
 
                 <Popup x:Name="HistoryPopup"
@@ -284,6 +285,97 @@
                                           TextWrapping="Wrap" Margin="0,0,0,12" />
                             <ui:Button Content="Discord" Appearance="Primary"
                                        HorizontalAlignment="Stretch" Click="DiscordButton_Click" />
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+                <Popup x:Name="InfoPopup"
+                       PlacementTarget="{Binding ElementName=InfoButton}"
+                       Placement="Bottom"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade"
+                       HorizontalOffset="-300">
+                    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
+                            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Margin="0,6,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
+                        </Border.Effect>
+                        <StackPanel Width="380">
+                            <ui:TextBlock Text="Information &amp; användarvillkor"
+                                          FontTypography="BodyStrong" Margin="0,0,0,10" />
+
+                            <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
+                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                <Run Text="Detta program är skapat för " />
+                                <Run Text="personligt bruk" FontWeight="SemiBold" />
+                                <Run Text=" och är gratis att använda. Det bygger på öppen källkod (YoutubeExplode + FFmpeg)." />
+                            </ui:TextBlock>
+
+                            <ui:TextBlock Text="Vad som är tillåtet"
+                                          FontTypography="BodyStrong" Margin="0,4,0,4" />
+                            <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
+                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                <Run Text="• Ladda ner ditt eget material." />
+                                <LineBreak />
+                                <Run Text="• Ladda ner videor med Creative Commons-licens." />
+                                <LineBreak />
+                                <Run Text="• Ladda ner innehåll där rättighetsinnehavaren uttryckligen tillåter det." />
+                                <LineBreak />
+                                <Run Text="• Spara videor från offentlig domän." />
+                            </ui:TextBlock>
+
+                            <ui:TextBlock Text="Vad som INTE är tillåtet"
+                                          FontTypography="BodyStrong" Margin="0,4,0,4" />
+                            <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
+                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                <Run Text="• Ladda ner upphovsrättsskyddat material utan tillstånd." />
+                                <LineBreak />
+                                <Run Text="• Distribuera, sälja eller publicera nerladdat innehåll." />
+                                <LineBreak />
+                                <Run Text="• Använda materialet i kommersiellt syfte utan licens." />
+                                <LineBreak />
+                                <Run Text="• Kringgå betalväggar eller geo-blockeringar." />
+                            </ui:TextBlock>
+
+                            <Border Background="#33FF6B6B"
+                                    BorderBrush="#FFFF6B6B"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="10"
+                                    Margin="0,4,0,10">
+                                <StackPanel>
+                                    <ui:TextBlock Text="⚠ Risker vid felaktig användning"
+                                                  FontTypography="BodyStrong"
+                                                  Foreground="#FFFF8A8A"
+                                                  Margin="0,0,0,6" />
+                                    <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap"
+                                                  Foreground="{DynamicResource TextFillColorPrimaryBrush}">
+                                        <Run Text="Att ladda ner upphovsrättsskyddat material utan tillstånd kan leda till:" />
+                                        <LineBreak />
+                                        <Run Text="• " /><Run Text="Civilrättsliga skadeståndskrav" FontWeight="SemiBold" /><Run Text=" från rättighetsinnehavare (kan bli mycket dyrt)." />
+                                        <LineBreak />
+                                        <Run Text="• " /><Run Text="Böter eller fängelse" FontWeight="SemiBold" /><Run Text=" enligt upphovsrättslagen (varierar per land)." />
+                                        <LineBreak />
+                                        <Run Text="• " /><Run Text="Avstängning av YouTube-konto" FontWeight="SemiBold" /><Run Text=" eller IP-blockering." />
+                                        <LineBreak />
+                                        <Run Text="• " /><Run Text="Krav på borttagning" FontWeight="SemiBold" /><Run Text=" (DMCA / takedown notices) om materialet sprids vidare." />
+                                        <LineBreak />
+                                        <Run Text="• " /><Run Text="Skadestånd vid kommersiellt bruk" FontWeight="SemiBold" /><Run Text=" — kan bli flera tusen kronor per intrång." />
+                                    </ui:TextBlock>
+                                </StackPanel>
+                            </Border>
+
+                            <ui:TextBlock Text="Ansvar"
+                                          FontTypography="BodyStrong" Margin="0,0,0,4" />
+                            <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap"
+                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                <Run Text="YouTubes användarvillkor förbjuder generellt nedladdning utan tillstånd. Genom att använda detta program bekräftar du att du själv ansvarar för hur det används och att svensk samt internationell upphovsrättslagstiftning följs. Utvecklaren tar inget juridiskt eller ekonomiskt ansvar för missbruk." />
+                            </ui:TextBlock>
                         </StackPanel>
                     </Border>
                 </Popup>

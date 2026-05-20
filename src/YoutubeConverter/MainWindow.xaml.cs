@@ -29,6 +29,11 @@ public partial class MainWindow : FluentWindow
         UpdatesPopup.IsOpen = !UpdatesPopup.IsOpen;
     }
 
+    private void InfoButton_Click(object sender, RoutedEventArgs e)
+    {
+        InfoPopup.IsOpen = !InfoPopup.IsOpen;
+    }
+
     private void DiscordButton_Click(object sender, RoutedEventArgs e)
     {
         ContactPopup.IsOpen = false;
