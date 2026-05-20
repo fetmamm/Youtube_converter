@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using YoutubeConverter.Models;
 using YoutubeExplode;
 using YoutubeExplode.Converter;
 using YoutubeExplode.Videos;
@@ -8,8 +9,6 @@ using YoutubeExplode.Videos.ClosedCaptions;
 using YoutubeExplode.Videos.Streams;
 
 namespace YoutubeConverter.Services;
-
-public sealed record VideoPreview(string Title, string Author, TimeSpan? Duration, string ThumbnailUrl);
 
 public sealed class YoutubeDownloadService
 {

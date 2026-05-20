@@ -1,23 +1,8 @@
 using System.IO;
 using System.Text.Json;
+using YoutubeConverter.Models;
 
 namespace YoutubeConverter.Services;
-
-public sealed class HistoryEntry
-{
-    public string Title { get; set; } = "";
-    public string Url { get; set; } = "";
-    public string FilePath { get; set; } = "";
-    public string Format { get; set; } = "";
-    public DateTime Timestamp { get; set; } = DateTime.Now;
-}
-
-public sealed class AppSettings
-{
-    public string? LastFolder { get; set; }
-    public string LastQuality { get; set; } = "Best";
-    public List<HistoryEntry> History { get; set; } = new();
-}
 
 public static class SettingsService
 {

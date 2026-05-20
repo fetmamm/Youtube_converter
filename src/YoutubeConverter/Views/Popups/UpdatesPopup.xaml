@@ -1,0 +1,54 @@
+<UserControl x:Class="YoutubeConverter.Views.Popups.UpdatesPopup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
+            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="8"
+            Padding="16"
+            Margin="0,6,0,0">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
+        </Border.Effect>
+        <StackPanel Width="280">
+            <ui:TextBlock Text="Updates" FontTypography="BodyStrong" Margin="0,0,0,10" />
+
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBlock Grid.Column="0" Text="Current version:" FontTypography="Caption"
+                              Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBlock Grid.Column="1" Text="{Binding AppVersion}" FontTypography="Caption" />
+            </Grid>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBlock Grid.Column="0" Text="Latest version:" FontTypography="Caption"
+                              Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <ui:TextBlock Grid.Column="1" Text="{Binding LatestVersionText}" FontTypography="Caption" />
+            </Grid>
+
+            <ui:Button Content="Download new version"
+                       Appearance="Primary"
+                       HorizontalAlignment="Stretch"
+                       Margin="0,0,0,6"
+                       Command="{Binding OpenUpdateCommand}"
+                       Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+            <ui:Button Content="Check for updates"
+                       HorizontalAlignment="Stretch"
+                       Margin="0,0,0,6"
+                       Command="{Binding CheckUpdatesCommand}" />
+
+            <ui:Button Content="Open GitHub repo"
+                       HorizontalAlignment="Stretch"
+                       Command="{Binding OpenRepoCommand}" />
+        </StackPanel>
+    </Border>
+</UserControl>

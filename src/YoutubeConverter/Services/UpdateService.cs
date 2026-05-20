@@ -1,14 +1,12 @@
 using System.Net.Http;
 using System.Reflection;
 using System.Text.Json;
+using YoutubeConverter.Models;
 
 namespace YoutubeConverter.Services;
 
-public sealed record UpdateInfo(string LatestVersion, string ReleaseUrl);
-
 public static class UpdateService
 {
-    // Ändra till ditt eget repo när du publicerar releases på GitHub.
     public const string GitHubOwner = "fetmamm";
     public const string GitHubRepo = "Youtube_converter";
 

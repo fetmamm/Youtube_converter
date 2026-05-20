@@ -1,0 +1,145 @@
+using System.IO;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
+using YoutubeConverter.Helpers;
+using YoutubeConverter.Models;
+using YoutubeConverter.Resources;
+using YoutubeConverter.Services;
+
+namespace YoutubeConverter.ViewModels;
+
+public partial class MainViewModel
+{
+    private CancellationTokenSource? _downloadCts;
+    private string? _lastSavedFile;
+
+    [ObservableProperty]
+    private bool _trimEnabled;
+
+    [ObservableProperty]
+    private string _trimStart = "0:00";
+
+    [ObservableProperty]
+    private string _trimEnd = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanShowOpenFolder))]
+    private bool _hasLastFile;
+
+    public bool CanShowOpenFolder => HasLastFile && !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanExport))]
+    private async Task ExportAsync()
+    {
+        var url = Url.Trim();
+        var isAudio = IsMp3;
+        var ext = isAudio ? "mp3" : "mp4";
+
+        _downloadCts = new CancellationTokenSource();
+        IsBusy = true;
+        Progress = 0;
+        HasLastFile = false;
+
+        try
+        {
+            var title = PreviewTitle ?? await _service.GetVideoTitleAsync(url, _downloadCts.Token);
+            var safeName = PathHelpers.SanitizeFileName(title);
+
+            var dialog = new SaveFileDialog
+            {
+                FileName = safeName,
+                DefaultExt = ext,
+                AddExtension = true,
+                Filter = isAudio ? Strings.Mp3FilterText : Strings.Mp4FilterText,
+                Title = Strings.SaveAsDialogTitle
+            };
+            if (!string.IsNullOrEmpty(_settings.LastFolder) && Directory.Exists(_settings.LastFolder))
+                dialog.InitialDirectory = _settings.LastFolder;
+
+            if (dialog.ShowDialog() != true)
+            {
+                StatusText = Strings.Cancelled;
+                return;
+            }
+
+            _settings.LastFolder = Path.GetDirectoryName(dialog.FileName);
+            SettingsService.Save(_settings);
+
+            var progress = new Progress<double>(p =>
+            {
+                Progress = p;
+                StatusText = string.Format(Strings.DownloadingProgressFmt, p * 100);
+            });
+
+            TimeSpan? trimStart = null, trimEnd = null;
+            if (TrimEnabled)
+            {
+                trimStart = YoutubeDownloadService.ParseTime(TrimStart);
+                trimEnd = YoutubeDownloadService.ParseTime(TrimEnd);
+                if (trimStart.HasValue && trimEnd.HasValue && trimEnd <= trimStart)
+                {
+                    StatusText = Strings.TrimEndAfterStart;
+                    return;
+                }
+            }
+
+            StatusText = TrimEnabled ? Strings.DownloadingAndTrimming : Strings.Downloading;
+            await _service.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
+
+            Progress = 1;
+            _lastSavedFile = dialog.FileName;
+            HasLastFile = true;
+            StatusText = string.Format(Strings.DoneSavedFmt, Path.GetFileName(dialog.FileName));
+
+            AddToHistory(new HistoryEntry
+            {
+                Title = title,
+                Url = url,
+                FilePath = dialog.FileName,
+                Format = ext.ToUpperInvariant(),
+                Timestamp = DateTime.Now
+            });
+        }
+        catch (OperationCanceledException)
+        {
+            StatusText = Strings.CancelledByUser;
+            Progress = 0;
+        }
+        catch (Exception ex)
+        {
+            StatusText = string.Format(Strings.ErrorFmt, ex.Message);
+        }
+        finally
+        {
+            IsBusy = false;
+            _downloadCts?.Dispose();
+            _downloadCts = null;
+        }
+    }
+
+    private bool CanExport() => !IsBusy && HasPreview;
+
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void Cancel() => _downloadCts?.Cancel();
+    private bool CanCancel() => IsBusy;
+
+    [RelayCommand]
+    private void OpenLastFolder()
+    {
+        if (!string.IsNullOrEmpty(_lastSavedFile) && File.Exists(_lastSavedFile))
+        {
+            ExplorerLauncher.RevealFile(_lastSavedFile);
+            return;
+        }
+
+        var folder = !string.IsNullOrEmpty(_settings.LastFolder) && Directory.Exists(_settings.LastFolder)
+            ? _settings.LastFolder
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads");
+
+        if (!Directory.Exists(folder))
+            folder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        ExplorerLauncher.OpenFolder(folder);
+    }
+}
