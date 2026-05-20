@@ -52,7 +52,7 @@
 
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal">
-                        <ui:TextBlock Text="Youtube video converter" FontTypography="BodyStrong" />
+                        <ui:TextBlock Text="YouTube Converter" FontTypography="BodyStrong" />
                         <ui:TextBlock Text="{Binding AppVersion}"
                                       FontTypography="Caption"
                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"
@@ -64,12 +64,12 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
                     <ui:Button x:Name="HistoryButton"
                                Icon="{ui:SymbolIcon Symbol=History24}"
-                               ToolTip="Historik"
+                               ToolTip="History"
                                Margin="0,0,8,0"
                                Click="HistoryButton_Click" />
                     <ui:Button x:Name="UpdatesButton"
                                Icon="{ui:SymbolIcon Symbol=ArrowSync24}"
-                               ToolTip="Uppdateringar"
+                               ToolTip="Updates"
                                Margin="0,0,8,0"
                                Click="UpdatesButton_Click">
                         <ui:Button.Style>
@@ -84,7 +84,7 @@
                     </ui:Button>
                     <ui:Button x:Name="ContactButton"
                                Icon="{ui:SymbolIcon Symbol=Mail24}"
-                               ToolTip="Kontakt"
+                               ToolTip="Contact"
                                Margin="0,0,8,0"
                                Click="ContactButton_Click" />
                     <ui:Button x:Name="InfoButton"
@@ -111,15 +111,15 @@
                         </Border.Effect>
                         <StackPanel Width="440">
                             <Grid Margin="0,0,0,6">
-                                <ui:TextBlock Text="Historik" FontTypography="BodyStrong" HorizontalAlignment="Left" />
-                                <ui:Button Content="Rensa allt"
+                                <ui:TextBlock Text="History" FontTypography="BodyStrong" HorizontalAlignment="Left" />
+                                <ui:Button Content="Clear all"
                                            HorizontalAlignment="Right"
                                            Padding="8,2"
                                            Command="{Binding ClearHistoryCommand}"
                                            Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibilityConverter}}" />
                             </Grid>
 
-                            <ui:TextBlock Text="Inga nedladdningar än."
+                            <ui:TextBlock Text="No downloads yet."
                                           FontTypography="Caption"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                           Margin="0,8"
@@ -184,13 +184,13 @@
                                                           Margin="0,0,6,0" />
                                             <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
                                                 <ui:Button Icon="{ui:SymbolIcon Symbol=FolderOpen24}"
-                                                           ToolTip="Öppna mapp"
+                                                           ToolTip="Open folder"
                                                            Padding="4,2"
                                                            Margin="0,0,2,0"
                                                            Command="{Binding DataContext.OpenHistoryItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                                            CommandParameter="{Binding}" />
                                                 <ui:Button Icon="{ui:SymbolIcon Symbol=Dismiss24}"
-                                                           ToolTip="Ta bort"
+                                                           ToolTip="Remove"
                                                            Padding="4,2"
                                                            Command="{Binding DataContext.RemoveHistoryItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
                                                            CommandParameter="{Binding}" />
@@ -220,14 +220,14 @@
                             <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
                         </Border.Effect>
                         <StackPanel Width="280">
-                            <ui:TextBlock Text="Uppdateringar" FontTypography="BodyStrong" Margin="0,0,0,10" />
+                            <ui:TextBlock Text="Updates" FontTypography="BodyStrong" Margin="0,0,0,10" />
 
                             <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ui:TextBlock Grid.Column="0" Text="Aktuell version:" FontTypography="Caption"
+                                <ui:TextBlock Grid.Column="0" Text="Current version:" FontTypography="Caption"
                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                 <ui:TextBlock Grid.Column="1" Text="{Binding AppVersion}" FontTypography="Caption" />
                             </Grid>
@@ -237,24 +237,24 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <ui:TextBlock Grid.Column="0" Text="Senaste version:" FontTypography="Caption"
+                                <ui:TextBlock Grid.Column="0" Text="Latest version:" FontTypography="Caption"
                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                 <ui:TextBlock Grid.Column="1" Text="{Binding LatestVersionText}" FontTypography="Caption" />
                             </Grid>
 
-                            <ui:Button Content="Ladda ner ny version"
+                            <ui:Button Content="Download new version"
                                        Appearance="Primary"
                                        HorizontalAlignment="Stretch"
                                        Margin="0,0,0,6"
                                        Command="{Binding OpenUpdateCommand}"
                                        Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-                            <ui:Button Content="Kontrollera uppdateringar"
+                            <ui:Button Content="Check for updates"
                                        HorizontalAlignment="Stretch"
                                        Margin="0,0,0,6"
                                        Command="{Binding CheckUpdatesCommand}" />
 
-                            <ui:Button Content="Öppna GitHub-repo"
+                            <ui:Button Content="Open GitHub repo"
                                        HorizontalAlignment="Stretch"
                                        Command="{Binding OpenRepoCommand}" />
                         </StackPanel>
@@ -278,8 +278,8 @@
                             <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
                         </Border.Effect>
                         <StackPanel Width="200">
-                            <ui:TextBlock Text="Kontakta oss" FontTypography="BodyStrong" Margin="0,0,0,4" />
-                            <ui:TextBlock Text="Gå med i vår community på Discord."
+                            <ui:TextBlock Text="Contact us" FontTypography="BodyStrong" Margin="0,0,0,4" />
+                            <ui:TextBlock Text="Join our community on Discord."
                                           FontTypography="Caption"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                           TextWrapping="Wrap" Margin="0,0,0,12" />
@@ -306,40 +306,40 @@
                             <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
                         </Border.Effect>
                         <StackPanel Width="380">
-                            <ui:TextBlock Text="Information &amp; användarvillkor"
+                            <ui:TextBlock Text="Information &amp; terms of use"
                                           FontTypography="BodyStrong" Margin="0,0,0,10" />
 
                             <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                <Run Text="Detta program är skapat för " />
-                                <Run Text="personligt bruk" FontWeight="SemiBold" />
-                                <Run Text=" och är gratis att använda. Det bygger på öppen källkod (YoutubeExplode + FFmpeg)." />
+                                <Run Text="This program is built for " />
+                                <Run Text="personal use" FontWeight="SemiBold" />
+                                <Run Text=" and is free to use. It is based on open-source libraries (YoutubeExplode + FFmpeg)." />
                             </ui:TextBlock>
 
-                            <ui:TextBlock Text="Vad som är tillåtet"
+                            <ui:TextBlock Text="What is allowed"
                                           FontTypography="BodyStrong" Margin="0,4,0,4" />
                             <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                <Run Text="• Ladda ner ditt eget material." />
+                                <Run Text="• Download your own material." />
                                 <LineBreak />
-                                <Run Text="• Ladda ner videor med Creative Commons-licens." />
+                                <Run Text="• Download videos with a Creative Commons license." />
                                 <LineBreak />
-                                <Run Text="• Ladda ner innehåll där rättighetsinnehavaren uttryckligen tillåter det." />
+                                <Run Text="• Download content where the rights holder has explicitly given permission." />
                                 <LineBreak />
-                                <Run Text="• Spara videor från offentlig domän." />
+                                <Run Text="• Save public-domain videos." />
                             </ui:TextBlock>
 
-                            <ui:TextBlock Text="Vad som INTE är tillåtet"
+                            <ui:TextBlock Text="What is NOT allowed"
                                           FontTypography="BodyStrong" Margin="0,4,0,4" />
                             <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                <Run Text="• Ladda ner upphovsrättsskyddat material utan tillstånd." />
+                                <Run Text="• Downloading copyrighted material without permission." />
                                 <LineBreak />
-                                <Run Text="• Distribuera, sälja eller publicera nerladdat innehåll." />
+                                <Run Text="• Distributing, selling or publishing downloaded content." />
                                 <LineBreak />
-                                <Run Text="• Använda materialet i kommersiellt syfte utan licens." />
+                                <Run Text="• Using the material for commercial purposes without a license." />
                                 <LineBreak />
-                                <Run Text="• Kringgå betalväggar eller geo-blockeringar." />
+                                <Run Text="• Circumventing paywalls or geo-restrictions." />
                             </ui:TextBlock>
 
                             <Border Background="#33FF6B6B"
@@ -349,32 +349,32 @@
                                     Padding="10"
                                     Margin="0,4,0,10">
                                 <StackPanel>
-                                    <ui:TextBlock Text="⚠ Risker vid felaktig användning"
+                                    <ui:TextBlock Text="⚠ Risks of misuse"
                                                   FontTypography="BodyStrong"
                                                   Foreground="#FFFF8A8A"
                                                   Margin="0,0,0,6" />
                                     <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap"
                                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}">
-                                        <Run Text="Att ladda ner upphovsrättsskyddat material utan tillstånd kan leda till:" />
+                                        <Run Text="Downloading copyrighted material without permission can lead to:" />
                                         <LineBreak />
-                                        <Run Text="• " /><Run Text="Civilrättsliga skadeståndskrav" FontWeight="SemiBold" /><Run Text=" från rättighetsinnehavare (kan bli mycket dyrt)." />
+                                        <Run Text="• " /><Run Text="Civil damages claims" FontWeight="SemiBold" /><Run Text=" from rights holders (can be very expensive)." />
                                         <LineBreak />
-                                        <Run Text="• " /><Run Text="Böter eller fängelse" FontWeight="SemiBold" /><Run Text=" enligt upphovsrättslagen (varierar per land)." />
+                                        <Run Text="• " /><Run Text="Fines or imprisonment" FontWeight="SemiBold" /><Run Text=" under copyright law (varies by country)." />
                                         <LineBreak />
-                                        <Run Text="• " /><Run Text="Avstängning av YouTube-konto" FontWeight="SemiBold" /><Run Text=" eller IP-blockering." />
+                                        <Run Text="• " /><Run Text="YouTube account suspension" FontWeight="SemiBold" /><Run Text=" or IP-based blocking." />
                                         <LineBreak />
-                                        <Run Text="• " /><Run Text="Krav på borttagning" FontWeight="SemiBold" /><Run Text=" (DMCA / takedown notices) om materialet sprids vidare." />
+                                        <Run Text="• " /><Run Text="Takedown notices" FontWeight="SemiBold" /><Run Text=" (DMCA) if the material is re-distributed." />
                                         <LineBreak />
-                                        <Run Text="• " /><Run Text="Skadestånd vid kommersiellt bruk" FontWeight="SemiBold" /><Run Text=" — kan bli flera tusen kronor per intrång." />
+                                        <Run Text="• " /><Run Text="Damages for commercial use" FontWeight="SemiBold" /><Run Text=" — often thousands of dollars per infringement." />
                                     </ui:TextBlock>
                                 </StackPanel>
                             </Border>
 
-                            <ui:TextBlock Text="Ansvar"
+                            <ui:TextBlock Text="Disclaimer"
                                           FontTypography="BodyStrong" Margin="0,0,0,4" />
                             <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                <Run Text="YouTubes användarvillkor förbjuder generellt nedladdning utan tillstånd. Genom att använda detta program bekräftar du att du själv ansvarar för hur det används och att svensk samt internationell upphovsrättslagstiftning följs. Utvecklaren tar inget juridiskt eller ekonomiskt ansvar för missbruk." />
+                                <Run Text="YouTube's Terms of Service generally prohibit downloading without permission. By using this program you acknowledge that you are solely responsible for how it is used and that you comply with applicable copyright laws. The developer assumes no legal or financial responsibility for misuse." />
                             </ui:TextBlock>
                         </StackPanel>
                     </Border>
@@ -388,7 +388,7 @@
                 </Grid.ColumnDefinitions>
 
                 <ui:TextBox Grid.Column="0"
-                            PlaceholderText="Klistra in YouTube-länk här…"
+                            PlaceholderText="Paste YouTube link here…"
                             Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
                             IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
                     <ui:TextBox.Style>
@@ -404,7 +404,7 @@
 
                 <ui:Button Grid.Column="1"
                            Margin="8,0,0,0"
-                           Content="Analysera"
+                           Content="Analyze"
                            Command="{Binding AnalyzeCommand}">
                     <ui:Button.Style>
                         <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
@@ -450,7 +450,7 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <RadioButton Content="MP3 (ljud)" GroupName="Format"
+                    <RadioButton Content="MP3 (audio)" GroupName="Format"
                                  IsChecked="{Binding IsMp3}" Margin="0,0,24,0" />
                     <RadioButton Content="MP4 (video)" GroupName="Format"
                                  IsChecked="{Binding IsMp4}" />
@@ -458,7 +458,7 @@
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
                             Visibility="{Binding ShowQualityPicker, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ui:TextBlock Text="Kvalitet:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ui:TextBlock Text="Quality:" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <ComboBox ItemsSource="{Binding Qualities}"
                               SelectedItem="{Binding SelectedQuality}"
                               MinWidth="100" />
@@ -467,7 +467,7 @@
 
             <StackPanel Grid.Row="4" Margin="0,0,0,12"
                         Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibilityConverter}}">
-                <CheckBox Content="Trimma video" IsChecked="{Binding TrimEnabled}" />
+                <CheckBox Content="Trim video" IsChecked="{Binding TrimEnabled}" />
                 <Grid Margin="24,8,0,0"
                       Visibility="{Binding TrimEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
@@ -480,9 +480,9 @@
                     </Grid.ColumnDefinitions>
                     <ui:TextBlock Grid.Column="0" Text="Start:" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <ui:TextBox Grid.Column="1" Width="90" Text="{Binding TrimStart, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:TextBlock Grid.Column="3" Text="Slut:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ui:TextBlock Grid.Column="3" Text="End:" VerticalAlignment="Center" Margin="0,0,8,0" />
                     <ui:TextBox Grid.Column="4" Width="90" Text="{Binding TrimEnd, UpdateSourceTrigger=PropertyChanged}" />
-                    <ui:TextBlock Grid.Column="5" Text="Format: m:ss eller h:mm:ss"
+                    <ui:TextBlock Grid.Column="5" Text="Format: m:ss or h:mm:ss"
                                   VerticalAlignment="Center" Margin="12,0,0,0"
                                   FontTypography="Caption"
                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
@@ -490,7 +490,7 @@
             </StackPanel>
 
             <StackPanel Grid.Row="5" Orientation="Horizontal">
-                <ui:Button Content="Exportera…"
+                <ui:Button Content="Export…"
                            Padding="20,8"
                            Command="{Binding ExportCommand}">
                     <ui:Button.Style>
@@ -505,11 +505,11 @@
                     </ui:Button.Style>
                 </ui:Button>
                 <ui:Button Icon="{ui:SymbolIcon Symbol=FolderOpen24}"
-                           ToolTip="Visa mapp"
+                           ToolTip="Show folder"
                            Margin="8,0,0,0"
                            Padding="14,8"
                            Command="{Binding OpenLastFolderCommand}" />
-                <ui:Button Content="Avbryt"
+                <ui:Button Content="Cancel"
                            Margin="32,0,0,0"
                            Padding="20,8"
                            Command="{Binding CancelCommand}"

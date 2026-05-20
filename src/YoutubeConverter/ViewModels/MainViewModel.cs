@@ -42,7 +42,7 @@ public partial class MainViewModel : ObservableObject
     private double _progress;
 
     [ObservableProperty]
-    private string _statusText = "Redo. Klistra in eller dra en YouTube-länk.";
+    private string _statusText = "Ready. Paste or drop a YouTube link.";
 
     [ObservableProperty]
     private string? _previewTitle;
@@ -70,7 +70,7 @@ public partial class MainViewModel : ObservableObject
     private string _trimEnd = string.Empty;
 
     [ObservableProperty]
-    private string _selectedQuality = "Bästa";
+    private string _selectedQuality = "Best";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ShowQualityPicker))]
@@ -87,7 +87,7 @@ public partial class MainViewModel : ObservableObject
     private string? _updateUrl;
 
     [ObservableProperty]
-    private string _latestVersionText = "Okänd (klicka för att kontrollera)";
+    private string _latestVersionText = "Unknown (click to check)";
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CheckUpdatesCommand))]
@@ -101,7 +101,9 @@ public partial class MainViewModel : ObservableObject
 
     public MainViewModel()
     {
-        SelectedQuality = _settings.LastQuality;
+        SelectedQuality = YoutubeDownloadService.Qualities.Contains(_settings.LastQuality)
+            ? _settings.LastQuality
+            : "Best";
         foreach (var h in _settings.History) History.Add(h);
         HasHistory = History.Count > 0;
         _ = CheckForUpdatesAsync();
@@ -146,7 +148,7 @@ public partial class MainViewModel : ObservableObject
 
         HasPreview = false;
         PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
-        StatusText = "Analyserar video…";
+        StatusText = "Analyzing video…";
 
         try
         {
@@ -162,12 +164,12 @@ public partial class MainViewModel : ObservableObject
             HasPreview = true;
             if (preview.Duration is { } dur)
                 TrimEnd = dur.ToString(dur.TotalHours >= 1 ? @"h\:mm\:ss" : @"m\:ss");
-            StatusText = "Klar att exportera.";
+            StatusText = "Ready to export.";
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            StatusText = $"Kunde inte läsa video: {ex.Message}";
+            StatusText = $"Could not read video: {ex.Message}";
         }
     }
 
@@ -195,15 +197,15 @@ public partial class MainViewModel : ObservableObject
                 FileName = safeName,
                 DefaultExt = ext,
                 AddExtension = true,
-                Filter = isAudio ? "MP3 ljud (*.mp3)|*.mp3" : "MP4 video (*.mp4)|*.mp4",
-                Title = "Spara som"
+                Filter = isAudio ? "MP3 audio (*.mp3)|*.mp3" : "MP4 video (*.mp4)|*.mp4",
+                Title = "Save as"
             };
             if (!string.IsNullOrEmpty(_settings.LastFolder) && Directory.Exists(_settings.LastFolder))
                 dialog.InitialDirectory = _settings.LastFolder;
 
             if (dialog.ShowDialog() != true)
             {
-                StatusText = "Avbruten.";
+                StatusText = "Cancelled.";
                 return;
             }
 
@@ -213,7 +215,7 @@ public partial class MainViewModel : ObservableObject
             var progress = new Progress<double>(p =>
             {
                 Progress = p;
-                StatusText = $"Laddar ner… {p * 100:0}%";
+                StatusText = $"Downloading… {p * 100:0}%";
             });
 
             TimeSpan? trimStart = null, trimEnd = null;
@@ -223,18 +225,18 @@ public partial class MainViewModel : ObservableObject
                 trimEnd = YoutubeDownloadService.ParseTime(TrimEnd);
                 if (trimStart.HasValue && trimEnd.HasValue && trimEnd <= trimStart)
                 {
-                    StatusText = "Trim-slutet måste vara efter starten.";
+                    StatusText = "Trim end must be after start.";
                     return;
                 }
             }
 
-            StatusText = TrimEnabled ? "Laddar ner och trimmar…" : "Laddar ner…";
+            StatusText = TrimEnabled ? "Downloading and trimming…" : "Downloading…";
             await _service.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
 
             Progress = 1;
             _lastSavedFile = dialog.FileName;
             HasLastFile = true;
-            StatusText = $"Klart! Sparat: {Path.GetFileName(dialog.FileName)}";
+            StatusText = $"Done! Saved: {Path.GetFileName(dialog.FileName)}";
 
             var entry = new HistoryEntry
             {
@@ -251,12 +253,12 @@ public partial class MainViewModel : ObservableObject
         }
         catch (OperationCanceledException)
         {
-            StatusText = "Avbruten av användaren.";
+            StatusText = "Cancelled by user.";
             Progress = 0;
         }
         catch (Exception ex)
         {
-            StatusText = $"Fel: {ex.Message}";
+            StatusText = $"Error: {ex.Message}";
         }
         finally
         {
@@ -317,19 +319,19 @@ public partial class MainViewModel : ObservableObject
             if (info != null)
             {
                 UpdateAvailable = true;
-                UpdateAvailableText = $"Ny version {info.LatestVersion} tillgänglig";
+                UpdateAvailableText = $"New version {info.LatestVersion} available";
                 UpdateUrl = info.ReleaseUrl;
                 LatestVersionText = $"v{info.LatestVersion}";
             }
             else
             {
                 UpdateAvailable = false;
-                LatestVersionText = $"{AppVersion} (senaste)";
+                LatestVersionText = $"{AppVersion} (latest)";
             }
         }
         catch
         {
-            LatestVersionText = "Kunde inte kontrollera";
+            LatestVersionText = "Could not check";
         }
         finally
         {
@@ -361,7 +363,7 @@ public partial class MainViewModel : ObservableObject
         if (File.Exists(entry.FilePath))
             Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{entry.FilePath}\"") { UseShellExecute = true });
         else
-            StatusText = "Filen finns inte längre på disk.";
+            StatusText = "File no longer exists on disk.";
     }
 
     [RelayCommand]

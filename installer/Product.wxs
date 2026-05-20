@@ -8,7 +8,7 @@
            Scope="perMachine">
 
     <SummaryInformation Description="YouTube Converter installer" />
-    <MajorUpgrade DowngradeErrorMessage="En nyare version av YouTube Converter är redan installerad." />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of YouTube Converter is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
     <Icon Id="AppIcon.ico" SourceFile="src\YoutubeConverter\app.ico" />
@@ -33,7 +33,7 @@
       <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder">
         <Shortcut Id="AppShortcut"
                   Name="YouTube Converter"
-                  Description="Ladda ner YouTube-videor som MP3 eller MP4"
+                  Description="Download YouTube videos as MP3 or MP4"
                   Target="[INSTALLFOLDER]YoutubeConverter.exe"
                   WorkingDirectory="INSTALLFOLDER" />
         <RegistryValue Root="HKCU"

@@ -15,7 +15,7 @@ public sealed class YoutubeDownloadService
 {
     private readonly YoutubeClient _yt = new();
 
-    public static IReadOnlyList<string> Qualities { get; } = new[] { "Bästa", "1080p", "720p", "480p", "360p" };
+    public static IReadOnlyList<string> Qualities { get; } = new[] { "Best", "1080p", "720p", "480p", "360p" };
 
     private static string FfmpegPath
     {
@@ -131,13 +131,13 @@ public sealed class YoutubeDownloadService
             RedirectStandardError = true
         };
 
-        using var process = Process.Start(psi) ?? throw new InvalidOperationException("Kunde inte starta ffmpeg.");
+        using var process = Process.Start(psi) ?? throw new InvalidOperationException("Could not start ffmpeg.");
         var stderrTask = process.StandardError.ReadToEndAsync(ct);
         await process.WaitForExitAsync(ct);
         if (process.ExitCode != 0)
         {
             var err = await stderrTask;
-            throw new InvalidOperationException($"Trim misslyckades (ffmpeg exit {process.ExitCode}): {err}");
+            throw new InvalidOperationException($"Trim failed (ffmpeg exit {process.ExitCode}): {err}");
         }
     }
 
@@ -161,7 +161,7 @@ public sealed class YoutubeDownloadService
     private static IVideoStreamInfo PickVideoStream(StreamManifest manifest, string quality)
     {
         var all = manifest.GetVideoStreams().OrderByDescending(s => s.VideoQuality.MaxHeight).ToList();
-        if (quality == "Bästa" || string.IsNullOrEmpty(quality))
+        if (quality == "Best" || string.IsNullOrEmpty(quality))
             return manifest.GetVideoStreams().GetWithHighestVideoQuality();
 
         if (int.TryParse(quality.TrimEnd('p'), out var targetHeight))

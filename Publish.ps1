@@ -1,5 +1,5 @@
-# Paketerar YoutubeConverter som en självständig Windows-app.
-# Resultatet: en enda .exe + ffmpeg-mapp som kan kopieras till valfri Win10/11-maskin.
+# Packages YoutubeConverter as a self-contained Windows app.
+# Result: a single .exe + ffmpeg folder that can be copied to any Win10/11 machine.
 
 $ErrorActionPreference = 'Stop'
 $projectDir = Join-Path $PSScriptRoot 'src\YoutubeConverter'
@@ -7,7 +7,7 @@ $publishDir = Join-Path $PSScriptRoot 'dist'
 
 if (Test-Path $publishDir) { Remove-Item -Recurse -Force $publishDir }
 
-Write-Host 'Publicerar self-contained single-file build for win-x64...' -ForegroundColor Cyan
+Write-Host 'Publishing self-contained single-file build for win-x64...' -ForegroundColor Cyan
 dotnet publish $projectDir `
     -c Release `
     -r win-x64 `
@@ -17,8 +17,8 @@ dotnet publish $projectDir `
     -p:EnableCompressionInSingleFile=true `
     -o $publishDir
 
-if ($LASTEXITCODE -ne 0) { throw 'Publish misslyckades.' }
+if ($LASTEXITCODE -ne 0) { throw 'Publish failed.' }
 
 Write-Host ''
-Write-Host "Klart! Appen finns har: $publishDir" -ForegroundColor Green
-Write-Host '   Dubbelklicka YoutubeConverter.exe for att kora.'
+Write-Host "Done! The app is in: $publishDir" -ForegroundColor Green
+Write-Host '   Double-click YoutubeConverter.exe to run.'

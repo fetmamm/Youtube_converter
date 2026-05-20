@@ -111,4 +111,4 @@ jobs:
           $msi = "YoutubeConverter-v$version-win-x64.msi"
           gh release create $tag $zip $msi `
             --title "YouTube Converter $tag" `
-            --notes "Automatisk release för version $version.`n`n**Installation:**`n- ``.msi`` — Dubbelklicka för att installera (Start-meny + skrivbordsgenväg).`n- ``.zip`` — Packa upp och kör ``YoutubeConverter.exe`` direkt (portable)."
+            --notes "Automatic release for version $version.`n`n**Installation:**`n- ``.msi`` — Double-click to install (Start menu + desktop shortcut).`n- ``.zip`` — Extract and run ``YoutubeConverter.exe`` directly (portable)."
