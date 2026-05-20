@@ -2,7 +2,24 @@
 
 A clean, simple Windows app written in C# / WPF that downloads YouTube videos as **MP3** (audio) or **MP4** (video).
 
-> ⚠️ **Disclaimer:** YouTube's Terms of Service generally prohibit downloading without permission. Use this tool only with content you own, Creative Commons material, or where the rights holder has given consent. You are solely responsible for how this software is used. See the in-app **Info** panel for details.
+---
+
+## ⚠️ Important legal disclaimer — read before using
+
+**This software is provided for personal, lawful use only.**
+
+YouTube's [Terms of Service](https://www.youtube.com/static?template=terms) generally **prohibit** downloading content from the platform unless a download button or link is explicitly provided by YouTube, or you have the rights holder's written permission.
+
+By downloading, building, or running this software, **you acknowledge that:**
+
+- You will use it **only** with content you own, Creative Commons / public-domain material, or content you have explicit permission to download.
+- You will **not** use it to download copyrighted material without authorisation, circumvent paywalls or geo-restrictions, or redistribute downloaded content.
+- You understand that misuse may expose you to **civil damages, fines, account suspension, or criminal liability** under the copyright laws of your country.
+- The author and contributors of this project **provide no warranty** and **assume no legal or financial responsibility** for how you use the software. Liability rests entirely with the end user.
+
+This tool is published under the [MIT License](LICENSE), which explicitly disclaims all warranties and liability. If you do not agree to these terms, do not use this software.
+
+---
 
 ## Features
 
@@ -108,7 +125,7 @@ User data (history, settings) is stored in `%APPDATA%\YoutubeConverter\settings.
 
 ## License
 
-No license is published yet — code is shared as-is for personal use. Open an issue if you'd like to discuss reuse.
+Released under the [MIT License](LICENSE) — you may use, modify, and distribute this code freely, provided the copyright notice is preserved. The MIT License explicitly disclaims all warranties and liability.
 
 ## Contributing
 
