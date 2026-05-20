@@ -32,8 +32,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $tag = "${{ steps.version.outputs.tag }}"
-          $exists = (gh release view $tag 2>$null) -ne $null
+          gh release view $tag *> $null
+          $exists = ($LASTEXITCODE -eq 0)
+          $global:LASTEXITCODE = 0
           "exists=$exists" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Release $tag exists: $exists"
 
       - name: Setup .NET
         if: steps.check.outputs.exists != 'True'
