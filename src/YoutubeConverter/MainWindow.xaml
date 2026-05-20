@@ -4,8 +4,10 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:vm="clr-namespace:YoutubeConverter.ViewModels"
         Title="YouTube Converter"
-        Width="560" Height="540"
-        MinWidth="560" MinHeight="540"
+        Icon="app.ico"
+        Width="560"
+        MinWidth="560"
+        SizeToContent="Height"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
         ExtendsContentIntoTitleBar="True"
@@ -24,7 +26,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="YouTube Converter" />
+        <ui:TitleBar Grid.Row="0" Title="YouTube Converter">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="/app.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
         <Grid Grid.Row="1" Margin="24,12,24,20">
             <Grid.RowDefinitions>
@@ -45,8 +51,14 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <ui:TextBlock Text="Youtube video converter"
-                                  FontTypography="BodyStrong" />
+                    <StackPanel Orientation="Horizontal">
+                        <ui:TextBlock Text="Youtube video converter" FontTypography="BodyStrong" />
+                        <ui:TextBlock Text="{Binding AppVersion}"
+                                      FontTypography="Caption"
+                                      Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                      VerticalAlignment="Center"
+                                      Margin="8,0,0,0" />
+                    </StackPanel>
                     <ui:TextBlock Text="Klistra in eller dra en YouTube-länk och välj format."
                                   FontTypography="Body"
                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
@@ -54,19 +66,199 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
-                    <ui:Button Content="{Binding UpdateAvailableText}"
-                               Appearance="Caution"
-                               Margin="0,0,8,0"
-                               Command="{Binding OpenUpdateCommand}"
-                               Visibility="{Binding UpdateAvailableText, Converter={StaticResource NullToVisibilityConverter}}" />
                     <ui:Button x:Name="HistoryButton"
-                               Content="Historik"
+                               Icon="{ui:SymbolIcon Symbol=History24}"
+                               ToolTip="Historik"
                                Margin="0,0,8,0"
                                Click="HistoryButton_Click" />
+                    <ui:Button x:Name="UpdatesButton"
+                               Icon="{ui:SymbolIcon Symbol=ArrowSync24}"
+                               ToolTip="Uppdateringar"
+                               Margin="0,0,8,0"
+                               Click="UpdatesButton_Click">
+                        <ui:Button.Style>
+                            <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding UpdateAvailable}" Value="True">
+                                        <Setter Property="Appearance" Value="Caution" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                    </ui:Button>
                     <ui:Button x:Name="ContactButton"
-                               Content="Kontakt"
+                               Icon="{ui:SymbolIcon Symbol=Mail24}"
+                               ToolTip="Kontakt"
                                Click="ContactButton_Click" />
                 </StackPanel>
+
+                <Popup x:Name="HistoryPopup"
+                       PlacementTarget="{Binding ElementName=HistoryButton}"
+                       Placement="Bottom"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade"
+                       HorizontalOffset="-220">
+                    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
+                            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12"
+                            Margin="0,6,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
+                        </Border.Effect>
+                        <StackPanel Width="440">
+                            <Grid Margin="0,0,0,6">
+                                <ui:TextBlock Text="Historik" FontTypography="BodyStrong" HorizontalAlignment="Left" />
+                                <ui:Button Content="Rensa allt"
+                                           HorizontalAlignment="Right"
+                                           Padding="8,2"
+                                           Command="{Binding ClearHistoryCommand}"
+                                           Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibilityConverter}}" />
+                            </Grid>
+
+                            <ui:TextBlock Text="Inga nedladdningar än."
+                                          FontTypography="Caption"
+                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                          Margin="0,8"
+                                          HorizontalAlignment="Center">
+                                <ui:TextBlock.Style>
+                                    <Style TargetType="ui:TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding HasHistory}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:TextBlock.Style>
+                            </ui:TextBlock>
+
+                            <ListBox ItemsSource="{Binding History}"
+                                     MaxHeight="420"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     Visibility="{Binding HasHistory, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Height="32">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="42" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0"
+                                                    Background="{DynamicResource AccentFillColorTertiaryBrush}"
+                                                    CornerRadius="3"
+                                                    Height="18"
+                                                    Width="36"
+                                                    HorizontalAlignment="Left"
+                                                    VerticalAlignment="Center">
+                                                <ui:TextBlock Text="{Binding Format}"
+                                                              FontTypography="Caption"
+                                                              HorizontalAlignment="Center"
+                                                              VerticalAlignment="Center" />
+                                            </Border>
+                                            <ui:TextBlock Grid.Column="1"
+                                                          Text="{Binding Title}"
+                                                          FontTypography="Caption"
+                                                          VerticalAlignment="Center"
+                                                          TextTrimming="CharacterEllipsis"
+                                                          Margin="0,0,8,0" />
+                                            <ui:TextBlock Grid.Column="2"
+                                                          Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
+                                                          FontTypography="Caption"
+                                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                          VerticalAlignment="Center"
+                                                          Margin="0,0,6,0" />
+                                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <ui:Button Icon="{ui:SymbolIcon Symbol=FolderOpen24}"
+                                                           ToolTip="Öppna mapp"
+                                                           Padding="4,2"
+                                                           Margin="0,0,2,0"
+                                                           Command="{Binding DataContext.OpenHistoryItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                           CommandParameter="{Binding}" />
+                                                <ui:Button Icon="{ui:SymbolIcon Symbol=Dismiss24}"
+                                                           ToolTip="Ta bort"
+                                                           Padding="4,2"
+                                                           Command="{Binding DataContext.RemoveHistoryItemCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                           CommandParameter="{Binding}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </StackPanel>
+                    </Border>
+                </Popup>
+
+                <Popup x:Name="UpdatesPopup"
+                       PlacementTarget="{Binding ElementName=UpdatesButton}"
+                       Placement="Bottom"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade"
+                       HorizontalOffset="-160">
+                    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
+                            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Margin="0,6,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
+                        </Border.Effect>
+                        <StackPanel Width="280">
+                            <ui:TextBlock Text="Uppdateringar" FontTypography="BodyStrong" Margin="0,0,0,10" />
+
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock Grid.Column="0" Text="Aktuell version:" FontTypography="Caption"
+                                              Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <ui:TextBlock Grid.Column="1" Text="{Binding AppVersion}" FontTypography="Caption" />
+                            </Grid>
+
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:TextBlock Grid.Column="0" Text="Senaste version:" FontTypography="Caption"
+                                              Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <ui:TextBlock Grid.Column="1" Text="{Binding LatestVersionText}" FontTypography="Caption" />
+                            </Grid>
+
+                            <ui:Button Content="Ladda ner ny version"
+                                       Appearance="Primary"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="0,0,0,6"
+                                       Command="{Binding OpenUpdateCommand}"
+                                       Visibility="{Binding UpdateAvailable, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+                            <ui:Button Content="Kontrollera uppdateringar"
+                                       HorizontalAlignment="Stretch"
+                                       Margin="0,0,0,6"
+                                       Command="{Binding CheckUpdatesCommand}" />
+
+                            <ui:Button Content="Öppna GitHub-repo"
+                                       HorizontalAlignment="Stretch"
+                                       Command="{Binding OpenRepoCommand}" />
+                        </StackPanel>
+                    </Border>
+                </Popup>
 
                 <Popup x:Name="ContactPopup"
                        PlacementTarget="{Binding ElementName=ContactButton}"
@@ -120,9 +312,19 @@
 
                 <ui:Button Grid.Column="1"
                            Margin="8,0,0,0"
-                           Content="Klistra in"
-                           Command="{Binding PasteCommand}"
-                           IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+                           Content="Analysera"
+                           Command="{Binding AnalyzeCommand}">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Primary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasPreview}" Value="True">
+                                    <Setter Property="Appearance" Value="Secondary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
             </Grid>
 
             <Border Grid.Row="2"
@@ -171,31 +373,65 @@
                 </StackPanel>
             </Grid>
 
-            <StackPanel Grid.Row="4" Orientation="Horizontal">
+            <StackPanel Grid.Row="4" Margin="0,0,0,12"
+                        Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibilityConverter}}">
+                <CheckBox Content="Trimma video" IsChecked="{Binding TrimEnabled}" />
+                <Grid Margin="24,8,0,0"
+                      Visibility="{Binding TrimEnabled, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ui:TextBlock Grid.Column="0" Text="Start:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ui:TextBox Grid.Column="1" Width="90" Text="{Binding TrimStart, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:TextBlock Grid.Column="3" Text="Slut:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ui:TextBox Grid.Column="4" Width="90" Text="{Binding TrimEnd, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:TextBlock Grid.Column="5" Text="Format: m:ss eller h:mm:ss"
+                                  VerticalAlignment="Center" Margin="12,0,0,0"
+                                  FontTypography="Caption"
+                                  Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Grid.Row="5" Orientation="Horizontal">
                 <ui:Button Content="Exportera…"
-                           Appearance="Primary"
                            Padding="20,8"
-                           Command="{Binding ExportCommand}" />
-                <ui:Button Content="Avbryt"
+                           Command="{Binding ExportCommand}">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasPreview}" Value="True">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+                <ui:Button Icon="{ui:SymbolIcon Symbol=FolderOpen24}"
+                           ToolTip="Visa mapp"
                            Margin="8,0,0,0"
+                           Padding="14,8"
+                           Command="{Binding OpenLastFolderCommand}" />
+                <ui:Button Content="Avbryt"
+                           Margin="32,0,0,0"
                            Padding="20,8"
                            Command="{Binding CancelCommand}"
                            Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
-                <ui:Button Content="Visa i Utforskaren"
-                           Margin="8,0,0,0"
-                           Padding="14,8"
-                           Command="{Binding OpenLastFolderCommand}"
-                           Visibility="{Binding CanShowOpenFolder, Converter={StaticResource BoolToVisibilityConverter}}" />
             </StackPanel>
 
-            <ProgressBar Grid.Row="5"
+            <ProgressBar Grid.Row="6"
                          Margin="0,16,0,8"
                          Height="6"
                          Minimum="0" Maximum="1"
                          Value="{Binding Progress}"
                          Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <ui:TextBlock Grid.Row="6"
+            <ui:TextBlock Grid.Row="7"
                           Text="{Binding StatusText}"
                           FontTypography="Caption"
                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"

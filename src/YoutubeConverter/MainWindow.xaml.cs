@@ -7,7 +7,7 @@ namespace YoutubeConverter;
 
 public partial class MainWindow : FluentWindow
 {
-    private const string DiscordUrl = "https://discord.gg/3ARGhyAPSZ";
+    private const string DiscordUrl = "https://discord.gg/9BJcKrDmbG";
 
     public MainWindow()
     {
@@ -17,6 +17,16 @@ public partial class MainWindow : FluentWindow
     private void ContactButton_Click(object sender, RoutedEventArgs e)
     {
         ContactPopup.IsOpen = !ContactPopup.IsOpen;
+    }
+
+    private void HistoryButton_Click(object sender, RoutedEventArgs e)
+    {
+        HistoryPopup.IsOpen = !HistoryPopup.IsOpen;
+    }
+
+    private void UpdatesButton_Click(object sender, RoutedEventArgs e)
+    {
+        UpdatesPopup.IsOpen = !UpdatesPopup.IsOpen;
     }
 
     private void DiscordButton_Click(object sender, RoutedEventArgs e)

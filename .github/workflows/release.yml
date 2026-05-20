@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths: ['VERSION']
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        shell: pwsh
+        run: |
+          $v = (Get-Content VERSION -Raw).Trim()
+          "version=$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "tag=v$v" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Version: $v"
+
+      - name: Check if release already exists
+        id: check
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ steps.version.outputs.tag }}"
+          $exists = (gh release view $tag 2>$null) -ne $null
+          "exists=$exists" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Setup .NET
+        if: steps.check.outputs.exists != 'True'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Download FFmpeg
+        if: steps.check.outputs.exists != 'True'
+        shell: pwsh
+        run: |
+          $url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+          $zip = "$env:TEMP\ffmpeg.zip"
+          $out = "$env:TEMP\ffmpeg-extract"
+          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+          Expand-Archive -Path $zip -DestinationPath $out -Force
+          $exe = Get-ChildItem -Path $out -Recurse -Filter ffmpeg.exe | Select-Object -First 1
+          $target = "src\YoutubeConverter\ffmpeg"
+          New-Item -ItemType Directory -Force -Path $target | Out-Null
+          Copy-Item -Path $exe.FullName -Destination "$target\ffmpeg.exe" -Force
+          Write-Host "FFmpeg installed at $target\ffmpeg.exe"
+
+      - name: Publish self-contained
+        if: steps.check.outputs.exists != 'True'
+        shell: pwsh
+        run: |
+          dotnet publish src/YoutubeConverter/YoutubeConverter.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true `
+            -o publish
+
+      - name: Create ZIP
+        if: steps.check.outputs.exists != 'True'
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $zipName = "YoutubeConverter-v$version-win-x64.zip"
+          Compress-Archive -Path publish\* -DestinationPath $zipName -Force
+          Write-Host "Created $zipName"
+
+      - name: Install WiX
+        if: steps.check.outputs.exists != 'True'
+        shell: pwsh
+        run: dotnet tool install --global wix --version 5.0.2
+
+      - name: Build MSI
+        if: steps.check.outputs.exists != 'True'
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $msiName = "YoutubeConverter-v$version-win-x64.msi"
+          wix build installer\Product.wxs `
+            -arch x64 `
+            -d Version="$version" `
+            -d PublishDir="..\publish" `
+            -o $msiName
+          Write-Host "Created $msiName"
+
+      - name: Create GitHub Release
+        if: steps.check.outputs.exists != 'True'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ steps.version.outputs.version }}"
+          $tag = "${{ steps.version.outputs.tag }}"
+          $zip = "YoutubeConverter-v$version-win-x64.zip"
+          $msi = "YoutubeConverter-v$version-win-x64.msi"
+          gh release create $tag $zip $msi `
+            --title "YouTube Converter $tag" `
+            --notes "Automatisk release för version $version.`n`n**Installation:**`n- ``.msi`` — Dubbelklicka för att installera (Start-meny + skrivbordsgenväg).`n- ``.zip`` — Packa upp och kör ``YoutubeConverter.exe`` direkt (portable)."

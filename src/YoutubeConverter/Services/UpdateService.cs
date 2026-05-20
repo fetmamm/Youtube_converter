@@ -9,7 +9,7 @@ public sealed record UpdateInfo(string LatestVersion, string ReleaseUrl);
 public static class UpdateService
 {
     // Ändra till ditt eget repo när du publicerar releases på GitHub.
-    public const string GitHubOwner = "your-github-username";
+    public const string GitHubOwner = "fetmamm";
     public const string GitHubRepo = "Youtube_converter";
 
     private static readonly HttpClient Http = new()
@@ -27,8 +27,6 @@ public static class UpdateService
 
     public static async Task<UpdateInfo?> CheckForUpdateAsync(CancellationToken ct = default)
     {
-        if (GitHubOwner.StartsWith("your-")) return null;
-
         try
         {
             var url = $"https://api.github.com/repos/{GitHubOwner}/{GitHubRepo}/releases/latest";

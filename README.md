@@ -9,6 +9,24 @@ En enkel, stilren Windows-app i C# / WPF för att ladda ner YouTube-videor som *
 - Progress-bar och status visas under nedladdning.
 - Fluent/Mica-design med mörkt tema (WPF-UI).
 
+## Versionshantering & releases
+
+Versionsnummer styrs av filen [`VERSION`](VERSION) i projektroten (format: `MAJOR.MINOR.PATCH`, t.ex. `1.0.0`).
+
+**Så skapar du en ny release:**
+1. Öppna `VERSION`, ändra numret (t.ex. `1.0.0` → `1.0.1`), commit och push till `main`.
+2. GitHub Actions ([release.yml](.github/workflows/release.yml)) triggar automatiskt:
+   - Bygger appen self-contained för Windows x64
+   - Laddar ner FFmpeg
+   - Skapar `YoutubeConverter-v{version}-win-x64.zip` (portable)
+   - Skapar `YoutubeConverter-v{version}-win-x64.msi` (installer, via WiX 5)
+   - Publicerar release `v{version}` på GitHub med båda filerna bifogade
+3. Användare kan ladda ner från <https://github.com/fetmamm/Youtube_converter/releases>
+
+Appen visar sin egen version nere i högra hörnet och kollar GitHub vid start — om en nyare release finns dyker en gul "Ny version tillgänglig"-knapp upp.
+
+**Manuell trigger:** GitHub → Actions → Release → Run workflow.
+
 ## Förutsättningar
 - Windows 10/11
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)

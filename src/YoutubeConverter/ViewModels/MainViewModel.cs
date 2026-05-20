@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -20,6 +19,9 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string> Qualities { get; } = new(YoutubeDownloadService.Qualities);
     public ObservableCollection<HistoryEntry> History { get; } = new();
 
+    public string AppVersion => $"v{UpdateService.CurrentVersion.ToString(3)}";
+    public string GitHubRepoUrl => $"https://github.com/{UpdateService.GitHubOwner}/{UpdateService.GitHubRepo}";
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
     private string _url = string.Empty;
@@ -32,7 +34,7 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
-    [NotifyCanExecuteChangedFor(nameof(PasteCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AnalyzeCommand))]
     [NotifyCanExecuteChangedFor(nameof(CancelCommand))]
     private bool _isBusy;
 
@@ -55,7 +57,17 @@ public partial class MainViewModel : ObservableObject
     private string? _previewThumbnail;
 
     [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ExportCommand))]
     private bool _hasPreview;
+
+    [ObservableProperty]
+    private bool _trimEnabled;
+
+    [ObservableProperty]
+    private string _trimStart = "0:00";
+
+    [ObservableProperty]
+    private string _trimEnd = string.Empty;
 
     [ObservableProperty]
     private string _selectedQuality = "Bästa";
@@ -74,6 +86,16 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string? _updateUrl;
 
+    [ObservableProperty]
+    private string _latestVersionText = "Okänd (klicka för att kontrollera)";
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CheckUpdatesCommand))]
+    private bool _isCheckingUpdates;
+
+    [ObservableProperty]
+    private bool _updateAvailable;
+
     public bool ShowQualityPicker => IsMp4;
     public bool CanShowOpenFolder => HasLastFile && !IsBusy;
 
@@ -88,7 +110,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _hasHistory;
 
-    partial void OnUrlChanged(string value) => _ = LoadPreviewAsync(value);
+    partial void OnUrlChanged(string value)
+    {
+        HasPreview = false;
+        PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
+        AnalyzeCommand.NotifyCanExecuteChanged();
+    }
     partial void OnSelectedQualityChanged(string value)
     {
         _settings.LastQuality = value;
@@ -108,27 +135,33 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(ShowQualityPicker));
     }
 
-    private async Task LoadPreviewAsync(string url)
+    [RelayCommand(CanExecute = nameof(CanAnalyze))]
+    private async Task AnalyzeAsync()
     {
+        var url = Url.Trim();
+        if (string.IsNullOrWhiteSpace(url)) return;
+
         _previewCts?.Cancel();
         var cts = _previewCts = new CancellationTokenSource();
 
         HasPreview = false;
         PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
-
-        if (string.IsNullOrWhiteSpace(url) || !LooksLikeYoutubeUrl(url)) return;
+        StatusText = "Analyserar video…";
 
         try
         {
-            await Task.Delay(400, cts.Token);
             var preview = await _service.GetPreviewAsync(url, cts.Token);
             if (cts.IsCancellationRequested) return;
 
             PreviewTitle = preview.Title;
             PreviewAuthor = preview.Author;
-            PreviewDuration = preview.Duration is { } d ? d.ToString(d.TotalHours >= 1 ? @"h\:mm\:ss" : @"m\:ss") : null;
+            PreviewDuration = preview.Duration is { } d
+                ? d.ToString(d.TotalHours >= 1 ? @"h\:mm\:ss" : @"m\:ss")
+                : null;
             PreviewThumbnail = preview.ThumbnailUrl;
             HasPreview = true;
+            if (preview.Duration is { } dur)
+                TrimEnd = dur.ToString(dur.TotalHours >= 1 ? @"h\:mm\:ss" : @"m\:ss");
             StatusText = "Klar att exportera.";
         }
         catch (OperationCanceledException) { }
@@ -138,18 +171,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private static bool LooksLikeYoutubeUrl(string url) =>
-        url.Contains("youtube.com", StringComparison.OrdinalIgnoreCase) ||
-        url.Contains("youtu.be", StringComparison.OrdinalIgnoreCase);
-
-    [RelayCommand(CanExecute = nameof(CanPaste))]
-    private void Paste()
-    {
-        if (Clipboard.ContainsText())
-            Url = Clipboard.GetText().Trim();
-    }
-
-    private bool CanPaste() => !IsBusy;
+    private bool CanAnalyze() => !IsBusy && !string.IsNullOrWhiteSpace(Url);
 
     [RelayCommand(CanExecute = nameof(CanExport))]
     private async Task ExportAsync()
@@ -194,8 +216,20 @@ public partial class MainViewModel : ObservableObject
                 StatusText = $"Laddar ner… {p * 100:0}%";
             });
 
-            StatusText = "Laddar ner…";
-            await _service.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, progress, _downloadCts.Token);
+            TimeSpan? trimStart = null, trimEnd = null;
+            if (TrimEnabled)
+            {
+                trimStart = YoutubeDownloadService.ParseTime(TrimStart);
+                trimEnd = YoutubeDownloadService.ParseTime(TrimEnd);
+                if (trimStart.HasValue && trimEnd.HasValue && trimEnd <= trimStart)
+                {
+                    StatusText = "Trim-slutet måste vara efter starten.";
+                    return;
+                }
+            }
+
+            StatusText = TrimEnabled ? "Laddar ner och trimmar…" : "Laddar ner…";
+            await _service.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
 
             Progress = 1;
             _lastSavedFile = dialog.FileName;
@@ -232,7 +266,7 @@ public partial class MainViewModel : ObservableObject
         }
     }
 
-    private bool CanExport() => !IsBusy && !string.IsNullOrWhiteSpace(Url);
+    private bool CanExport() => !IsBusy && HasPreview;
 
     [RelayCommand(CanExecute = nameof(CanCancel))]
     private void Cancel()
@@ -245,8 +279,20 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void OpenLastFolder()
     {
-        if (string.IsNullOrEmpty(_lastSavedFile) || !File.Exists(_lastSavedFile)) return;
-        Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_lastSavedFile}\"") { UseShellExecute = true });
+        if (!string.IsNullOrEmpty(_lastSavedFile) && File.Exists(_lastSavedFile))
+        {
+            Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{_lastSavedFile}\"") { UseShellExecute = true });
+            return;
+        }
+
+        var folder = !string.IsNullOrEmpty(_settings.LastFolder) && Directory.Exists(_settings.LastFolder)
+            ? _settings.LastFolder
+            : Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\Downloads";
+
+        if (!Directory.Exists(folder))
+            folder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+        Process.Start(new ProcessStartInfo("explorer.exe", $"\"{folder}\"") { UseShellExecute = true });
     }
 
     public void HandleDroppedText(string text)
@@ -264,19 +310,48 @@ public partial class MainViewModel : ObservableObject
 
     private async Task CheckForUpdatesAsync()
     {
-        var info = await UpdateService.CheckForUpdateAsync();
-        if (info != null)
+        IsCheckingUpdates = true;
+        try
         {
-            UpdateAvailableText = $"Ny version {info.LatestVersion} tillgänglig";
-            UpdateUrl = info.ReleaseUrl;
+            var info = await UpdateService.CheckForUpdateAsync();
+            if (info != null)
+            {
+                UpdateAvailable = true;
+                UpdateAvailableText = $"Ny version {info.LatestVersion} tillgänglig";
+                UpdateUrl = info.ReleaseUrl;
+                LatestVersionText = $"v{info.LatestVersion}";
+            }
+            else
+            {
+                UpdateAvailable = false;
+                LatestVersionText = $"{AppVersion} (senaste)";
+            }
+        }
+        catch
+        {
+            LatestVersionText = "Kunde inte kontrollera";
+        }
+        finally
+        {
+            IsCheckingUpdates = false;
         }
     }
+
+    [RelayCommand(CanExecute = nameof(CanCheckUpdates))]
+    private Task CheckUpdates() => CheckForUpdatesAsync();
+    private bool CanCheckUpdates() => !IsCheckingUpdates;
 
     [RelayCommand]
     private void OpenUpdate()
     {
         if (!string.IsNullOrEmpty(UpdateUrl))
             Process.Start(new ProcessStartInfo(UpdateUrl) { UseShellExecute = true });
+    }
+
+    [RelayCommand]
+    private void OpenRepo()
+    {
+        Process.Start(new ProcessStartInfo(GitHubRepoUrl) { UseShellExecute = true });
     }
 
     [RelayCommand]
