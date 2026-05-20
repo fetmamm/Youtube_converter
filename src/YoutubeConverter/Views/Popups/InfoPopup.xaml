@@ -12,8 +12,21 @@
             <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
         </Border.Effect>
         <StackPanel Width="380">
-            <ui:TextBlock Text="Information &amp; terms of use"
-                          FontTypography="BodyStrong" Margin="0,0,0,10" />
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBlock Grid.Column="0"
+                              Text="Information &amp; terms of use"
+                              FontTypography="BodyStrong"
+                              VerticalAlignment="Center" />
+                <ui:Button Grid.Column="1"
+                           Icon="{ui:SymbolIcon Symbol=Dismiss24}"
+                           ToolTip="Close"
+                           Padding="4"
+                           Click="Close_Click" />
+            </Grid>
 
             <ui:TextBlock FontTypography="Caption" TextWrapping="Wrap" Margin="0,0,0,10"
                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">

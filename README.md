@@ -23,16 +23,18 @@ This tool is published under the [MIT License](LICENSE), which explicitly discla
 
 ## Features
 
-- **Paste / drag-and-drop** a YouTube URL — or use the Paste shortcut.
-- **Analyze** before download — preview title, channel, length and thumbnail.
+- **Paste / drag-and-drop** a YouTube URL into the window.
+- **Analyze** before download — preview title, channel, length and thumbnail before committing.
 - Choose **MP3** (audio) or **MP4** (video) output.
 - **Quality picker** for MP4 (Best / 1080p / 720p / 480p / 360p).
-- **Trim video** — set start / end timestamps before export.
-- **Save As** dialog — pick destination and filename freely, last used folder is remembered.
+- **Trim video** — set start / end timestamps before export (`m:ss` or `h:mm:ss`).
+- **Save As** dialog — pick destination and filename freely; last used folder is remembered.
 - **Show folder** button — opens the destination folder in Explorer.
 - **Cancel** an in-progress download anytime.
-- **History** of the last 20 downloads with quick "open folder" and "remove" actions.
-- **Auto-update check** against GitHub releases on startup.
+- **History** of the last 20 downloads with quick *open folder* and *remove* actions.
+- **Auto-update check** against GitHub releases on startup; yellow chip when a new version is available.
+- **In-app information popup** with usage terms, risks and legal disclaimer.
+- **Discord contact** popup for quick access to the community.
 - **Fluent / Mica** dark theme (built on WPF-UI).
 - **Self-contained** — no .NET runtime required for end users.
 
@@ -40,8 +42,8 @@ This tool is published under the [MIT License](LICENSE), which explicitly discla
 
 Grab the latest release from <https://github.com/fetmamm/Youtube_converter/releases>:
 
-- **`.msi`** — Windows installer (adds Start menu + desktop shortcut, uninstall via Settings).
-- **`.zip`** — Portable build, extract and run `YoutubeConverter.exe`.
+- **`.msi`** — Windows installer. Adds Start menu and desktop shortcuts, registers in *Add/Remove Programs*, and **launches the app automatically on first install**. Major upgrades silently replace the previous version.
+- **`.zip`** — Portable build. Extract and run `YoutubeConverter.exe` directly.
 
 ## Versioning & releases
 
@@ -98,20 +100,44 @@ Output lands in `dist/YoutubeConverter.exe` — self-contained, no .NET runtime 
 .
 ├── VERSION                                    # Single source of version truth
 ├── Run.vbs / Build.ps1 / Publish.ps1          # Convenience launchers
+├── LICENSE                                    # MIT License
 ├── .github/workflows/release.yml              # Auto-release pipeline
-├── installer/Product.wxs                      # WiX installer definition
+├── installer/Product.wxs                      # WiX 5 installer definition
 ├── icons/                                     # Source for the app icon
 └── src/YoutubeConverter/
     ├── App.xaml(.cs)                          # App entry + theme
-    ├── MainWindow.xaml(.cs)                   # Main UI
-    ├── ViewModels/MainViewModel.cs            # MVVM state (URL, format, history, etc.)
+    ├── MainWindow.xaml(.cs)                   # Main window shell + popup hosts
+    ├── app.ico, app.manifest                  # Application metadata
+    ├── ffmpeg/ffmpeg.exe                      # (gitignored — add yourself)
+    │
+    ├── Models/                                # Plain data records
+    │   ├── AppSettings.cs                     # Persisted settings shape
+    │   ├── HistoryEntry.cs                    # One download history entry
+    │   ├── VideoPreview.cs                    # Result of "Analyze"
+    │   └── UpdateInfo.cs                      # Result of GitHub release check
+    │
     ├── Services/
     │   ├── YoutubeDownloadService.cs          # YoutubeExplode + FFmpeg integration
-    │   ├── SettingsService.cs                 # JSON-persisted settings (history, last folder)
-    │   └── UpdateService.cs                   # GitHub releases check
-    ├── Converters/                            # XAML value converters
-    ├── app.ico                                # Application icon
-    └── ffmpeg/ffmpeg.exe                      # (gitignored — add yourself)
+    │   ├── SettingsService.cs                 # JSON-persisted settings I/O
+    │   ├── UpdateService.cs                   # GitHub releases check
+    │   └── ExplorerLauncher.cs                # explorer.exe wrappers
+    │
+    ├── ViewModels/                            # MVVM split by feature (all partial of MainViewModel)
+    │   ├── MainViewModel.cs                   # Shell state, format, status, version
+    │   ├── MainViewModel.Preview.cs           # Analyze command + preview properties
+    │   ├── MainViewModel.Export.cs            # Export / cancel / open-folder + trim
+    │   ├── MainViewModel.History.cs           # History list + commands
+    │   └── MainViewModel.Updates.cs           # Update-check + commands
+    │
+    ├── Views/Popups/                          # UserControls hosted in <Popup>s
+    │   ├── HistoryPopup.xaml(.cs)
+    │   ├── UpdatesPopup.xaml(.cs)
+    │   ├── ContactPopup.xaml(.cs)             # Discord button
+    │   └── InfoPopup.xaml(.cs)                # Legal disclaimer + close X
+    │
+    ├── Converters/BoolConverters.cs           # XAML value converters
+    ├── Resources/Strings.cs                   # All UI/status strings as constants
+    └── Helpers/PathHelpers.cs                 # SanitizeFileName, FormatDuration
 ```
 
 User data (history, settings) is stored in `%APPDATA%\YoutubeConverter\settings.json`.
