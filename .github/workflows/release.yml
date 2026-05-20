@@ -95,7 +95,7 @@ jobs:
           wix build installer\Product.wxs `
             -arch x64 `
             -d Version="$version" `
-            -d PublishDir="..\publish" `
+            -d PublishDir="publish" `
             -o $msiName
           Write-Host "Created $msiName"
 

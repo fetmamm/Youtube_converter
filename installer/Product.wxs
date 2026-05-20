@@ -11,7 +11,7 @@
     <MajorUpgrade DowngradeErrorMessage="En nyare version av YouTube Converter är redan installerad." />
     <MediaTemplate EmbedCab="yes" />
 
-    <Icon Id="AppIcon.ico" SourceFile="..\src\YoutubeConverter\app.ico" />
+    <Icon Id="AppIcon.ico" SourceFile="src\YoutubeConverter\app.ico" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
 
     <StandardDirectory Id="ProgramFiles64Folder">
