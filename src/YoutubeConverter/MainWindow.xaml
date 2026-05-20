@@ -1,0 +1,205 @@
+<ui:FluentWindow x:Class="YoutubeConverter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:vm="clr-namespace:YoutubeConverter.ViewModels"
+        Title="YouTube Converter"
+        Width="560" Height="540"
+        MinWidth="560" MinHeight="540"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Mica"
+        AllowDrop="True"
+        DragOver="Window_DragOver"
+        Drop="Window_Drop">
+
+    <ui:FluentWindow.DataContext>
+        <vm:MainViewModel />
+    </ui:FluentWindow.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="YouTube Converter" />
+
+        <Grid Grid.Row="1" Margin="24,12,24,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <ui:TextBlock Text="Youtube video converter"
+                                  FontTypography="BodyStrong" />
+                    <ui:TextBlock Text="Klistra in eller dra en YouTube-länk och välj format."
+                                  FontTypography="Body"
+                                  Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                  Margin="0,2,0,0" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                    <ui:Button Content="{Binding UpdateAvailableText}"
+                               Appearance="Caution"
+                               Margin="0,0,8,0"
+                               Command="{Binding OpenUpdateCommand}"
+                               Visibility="{Binding UpdateAvailableText, Converter={StaticResource NullToVisibilityConverter}}" />
+                    <ui:Button x:Name="HistoryButton"
+                               Content="Historik"
+                               Margin="0,0,8,0"
+                               Click="HistoryButton_Click" />
+                    <ui:Button x:Name="ContactButton"
+                               Content="Kontakt"
+                               Click="ContactButton_Click" />
+                </StackPanel>
+
+                <Popup x:Name="ContactPopup"
+                       PlacementTarget="{Binding ElementName=ContactButton}"
+                       Placement="Bottom"
+                       StaysOpen="False"
+                       AllowsTransparency="True"
+                       PopupAnimation="Fade"
+                       HorizontalOffset="-120">
+                    <Border Background="{DynamicResource ApplicationBackgroundBrush}"
+                            BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Margin="0,6,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" ShadowDepth="2" Opacity="0.4" />
+                        </Border.Effect>
+                        <StackPanel Width="200">
+                            <ui:TextBlock Text="Kontakta oss" FontTypography="BodyStrong" Margin="0,0,0,4" />
+                            <ui:TextBlock Text="Gå med i vår community på Discord."
+                                          FontTypography="Caption"
+                                          Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                          TextWrapping="Wrap" Margin="0,0,0,12" />
+                            <ui:Button Content="Discord" Appearance="Primary"
+                                       HorizontalAlignment="Stretch" Click="DiscordButton_Click" />
+                        </StackPanel>
+                    </Border>
+                </Popup>
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <ui:TextBox Grid.Column="0"
+                            PlaceholderText="Klistra in YouTube-länk här…"
+                            Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
+                            IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+                    <ui:TextBox.Style>
+                        <Style TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+                            <Style.Triggers>
+                                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                    <Setter Property="PlaceholderEnabled" Value="False" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:TextBox.Style>
+                </ui:TextBox>
+
+                <ui:Button Grid.Column="1"
+                           Margin="8,0,0,0"
+                           Content="Klistra in"
+                           Command="{Binding PasteCommand}"
+                           IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+            </Grid>
+
+            <Border Grid.Row="2"
+                    Background="{DynamicResource ControlFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="12"
+                    Margin="0,0,0,12"
+                    Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="0" Width="120" Height="68" CornerRadius="4" ClipToBounds="True">
+                        <Image Source="{Binding PreviewThumbnail}" Stretch="UniformToFill" />
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="12,0,0,0" VerticalAlignment="Center">
+                        <ui:TextBlock Text="{Binding PreviewTitle}" FontTypography="BodyStrong" TextTrimming="CharacterEllipsis" />
+                        <ui:TextBlock Text="{Binding PreviewAuthor}" FontTypography="Caption"
+                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,2,0,0" />
+                        <ui:TextBlock Text="{Binding PreviewDuration}" FontTypography="Caption"
+                                      Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,2,0,0" />
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Row="3" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <RadioButton Content="MP3 (ljud)" GroupName="Format"
+                                 IsChecked="{Binding IsMp3}" Margin="0,0,24,0" />
+                    <RadioButton Content="MP4 (video)" GroupName="Format"
+                                 IsChecked="{Binding IsMp4}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right"
+                            Visibility="{Binding ShowQualityPicker, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ui:TextBlock Text="Kvalitet:" VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <ComboBox ItemsSource="{Binding Qualities}"
+                              SelectedItem="{Binding SelectedQuality}"
+                              MinWidth="100" />
+                </StackPanel>
+            </Grid>
+
+            <StackPanel Grid.Row="4" Orientation="Horizontal">
+                <ui:Button Content="Exportera…"
+                           Appearance="Primary"
+                           Padding="20,8"
+                           Command="{Binding ExportCommand}" />
+                <ui:Button Content="Avbryt"
+                           Margin="8,0,0,0"
+                           Padding="20,8"
+                           Command="{Binding CancelCommand}"
+                           Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+                <ui:Button Content="Visa i Utforskaren"
+                           Margin="8,0,0,0"
+                           Padding="14,8"
+                           Command="{Binding OpenLastFolderCommand}"
+                           Visibility="{Binding CanShowOpenFolder, Converter={StaticResource BoolToVisibilityConverter}}" />
+            </StackPanel>
+
+            <ProgressBar Grid.Row="5"
+                         Margin="0,16,0,8"
+                         Height="6"
+                         Minimum="0" Maximum="1"
+                         Value="{Binding Progress}"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
+
+            <ui:TextBlock Grid.Row="6"
+                          Text="{Binding StatusText}"
+                          FontTypography="Caption"
+                          Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                          Margin="0,8,0,0" />
+        </Grid>
+    </Grid>
+</ui:FluentWindow>
