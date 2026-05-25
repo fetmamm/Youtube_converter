@@ -9,7 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <RootNamespace>YoutubeConverter</RootNamespace>
-    <AssemblyName>YoutubeConverter</AssemblyName>
+    <AssemblyName>MediaConverter</AssemblyName>
     <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)..\..\VERSION').Trim())</Version>
     <AssemblyVersion>$(Version).0</AssemblyVersion>
     <FileVersion>$(Version).0</FileVersion>

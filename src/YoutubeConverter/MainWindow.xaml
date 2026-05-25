@@ -4,7 +4,7 @@
         xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
         xmlns:vm="clr-namespace:YoutubeConverter.ViewModels"
         xmlns:popups="clr-namespace:YoutubeConverter.Views.Popups"
-        Title="YouTube Converter"
+        Title="Media Converter"
         Icon="app.ico"
         Width="560"
         MinWidth="560"
@@ -27,7 +27,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ui:TitleBar Grid.Row="0" Title="YouTube Converter">
+        <ui:TitleBar Grid.Row="0" Title="Media Converter">
             <ui:TitleBar.Icon>
                 <ui:ImageIcon Source="/app.ico" />
             </ui:TitleBar.Icon>
@@ -55,7 +55,7 @@
 
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal">
-                        <ui:TextBlock Text="YouTube Converter" FontTypography="BodyStrong" />
+                        <ui:TextBlock Text="Media Converter" FontTypography="BodyStrong" />
                         <ui:TextBlock Text="{Binding AppVersion}"
                                       FontTypography="Caption"
                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"

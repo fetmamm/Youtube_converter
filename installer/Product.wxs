@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-  <Package Name="YouTube Converter"
+  <Package Name="Media Converter"
            Manufacturer="fetmamm"
            Version="$(var.Version)"
            UpgradeCode="D4F5A1C8-2B3E-4F7A-9C8D-1E2F3A4B5C6D"
            Compressed="yes"
            Scope="perMachine">
 
-    <SummaryInformation Description="YouTube Converter installer" />
-    <MajorUpgrade DowngradeErrorMessage="A newer version of YouTube Converter is already installed." />
+    <SummaryInformation Description="Media Converter installer" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Media Converter is already installed." />
     <MediaTemplate EmbedCab="yes" />
 
     <Icon Id="AppIcon.ico" SourceFile="src\YoutubeConverter\app.ico" />
     <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
 
     <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="INSTALLFOLDER" Name="YouTube Converter">
+      <Directory Id="INSTALLFOLDER" Name="Media Converter">
         <Directory Id="FfmpegDir" Name="ffmpeg">
           <Component Id="FfmpegComp">
             <File Source="$(var.PublishDir)\ffmpeg\ffmpeg.exe" KeyPath="yes" />
@@ -28,7 +28,7 @@
         </Directory>
         <Component Id="MainExeComp">
           <File Id="MainExe"
-                Source="$(var.PublishDir)\YoutubeConverter.exe"
+                Source="$(var.PublishDir)\MediaConverter.exe"
                 KeyPath="yes" />
         </Component>
       </Directory>
@@ -37,12 +37,12 @@
     <StandardDirectory Id="ProgramMenuFolder">
       <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder">
         <Shortcut Id="AppShortcut"
-                  Name="YouTube Converter"
-                  Description="Download YouTube videos as MP3 or MP4"
-                  Target="[INSTALLFOLDER]YoutubeConverter.exe"
+                  Name="Media Converter"
+                  Description="Download YouTube and Instagram videos as MP3 or MP4"
+                  Target="[INSTALLFOLDER]MediaConverter.exe"
                   WorkingDirectory="INSTALLFOLDER" />
         <RegistryValue Root="HKCU"
-                       Key="Software\fetmamm\YoutubeConverter"
+                       Key="Software\fetmamm\MediaConverter"
                        Name="installed"
                        Type="integer"
                        Value="1"
@@ -53,11 +53,11 @@
     <StandardDirectory Id="DesktopFolder">
       <Component Id="DesktopShortcut" Directory="DesktopFolder">
         <Shortcut Id="DesktopShortcutEntry"
-                  Name="YouTube Converter"
-                  Target="[INSTALLFOLDER]YoutubeConverter.exe"
+                  Name="Media Converter"
+                  Target="[INSTALLFOLDER]MediaConverter.exe"
                   WorkingDirectory="INSTALLFOLDER" />
         <RegistryValue Root="HKCU"
-                       Key="Software\fetmamm\YoutubeConverter"
+                       Key="Software\fetmamm\MediaConverter"
                        Name="desktopShortcut"
                        Type="integer"
                        Value="1"
@@ -65,7 +65,7 @@
       </Component>
     </StandardDirectory>
 
-    <Feature Id="Main" Title="YouTube Converter" Level="1">
+    <Feature Id="Main" Title="Media Converter" Level="1">
       <ComponentRef Id="MainExeComp" />
       <ComponentRef Id="FfmpegComp" />
       <ComponentRef Id="YtDlpComp" />
@@ -76,7 +76,7 @@
     <!-- Launch the app after a fresh install or upgrade (not on uninstall/repair). -->
     <CustomAction Id="LaunchApp"
                   Directory="INSTALLFOLDER"
-                  ExeCommand="cmd.exe /c start &quot;&quot; &quot;[INSTALLFOLDER]YoutubeConverter.exe&quot;"
+                  ExeCommand="cmd.exe /c start &quot;&quot; &quot;[INSTALLFOLDER]MediaConverter.exe&quot;"
                   Execute="immediate"
                   Impersonate="yes"
                   Return="asyncNoWait" />

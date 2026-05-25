@@ -108,6 +108,7 @@ public partial class MainViewModel
                 Url = url,
                 FilePath = dialog.FileName,
                 Format = ext.ToUpperInvariant(),
+                Platform = isInstagram ? DownloadPlatform.Instagram : DownloadPlatform.Youtube,
                 Timestamp = DateTime.Now
             });
         }

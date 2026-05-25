@@ -55,12 +55,26 @@
                     <DataTemplate>
                         <Grid Height="32">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="28" />
                                 <ColumnDefinition Width="42" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Border Grid.Column="0"
+                                    Background="{DynamicResource ControlFillColorSecondaryBrush}"
+                                    CornerRadius="3"
+                                    Height="18"
+                                    Width="24"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    ToolTip="{Binding PlatformName}">
+                                <ui:TextBlock Text="{Binding PlatformIcon}"
+                                              FontTypography="Caption"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                            </Border>
+                            <Border Grid.Column="1"
                                     Background="{DynamicResource AccentFillColorTertiaryBrush}"
                                     CornerRadius="3"
                                     Height="18"
@@ -72,19 +86,19 @@
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center" />
                             </Border>
-                            <ui:TextBlock Grid.Column="1"
+                            <ui:TextBlock Grid.Column="2"
                                           Text="{Binding Title}"
                                           FontTypography="Caption"
                                           VerticalAlignment="Center"
                                           TextTrimming="CharacterEllipsis"
                                           Margin="0,0,8,0" />
-                            <ui:TextBlock Grid.Column="2"
+                            <ui:TextBlock Grid.Column="3"
                                           Text="{Binding Timestamp, StringFormat='{}{0:MM-dd HH:mm}'}"
                                           FontTypography="Caption"
                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                                           VerticalAlignment="Center"
                                           Margin="0,0,6,0" />
-                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                            <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center">
                                 <ui:Button Icon="{ui:SymbolIcon Symbol=FolderOpen24}"
                                            ToolTip="Open folder"
                                            Padding="4,2"

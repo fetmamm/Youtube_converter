@@ -14,7 +14,7 @@ public static class UpdateService
     {
         DefaultRequestHeaders =
         {
-            { "User-Agent", "YoutubeConverter-UpdateCheck" },
+            { "User-Agent", "MediaConverter-UpdateCheck" },
             { "Accept", "application/vnd.github+json" }
         },
         Timeout = TimeSpan.FromSeconds(8)

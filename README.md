@@ -1,6 +1,6 @@
-# YouTube Converter
+# Media Converter
 
-A clean, simple Windows app written in C# / WPF that downloads YouTube videos as **MP3** (audio) or **MP4** (video).
+A clean, simple Windows app written in C# / WPF that downloads YouTube and Instagram videos as **MP3** (audio) or **MP4** (video).
 
 ---
 
@@ -23,10 +23,10 @@ This tool is published under the [MIT License](LICENSE), which explicitly discla
 
 ## Features
 
-- **Paste / drag-and-drop** a YouTube URL into the window.
+- **Paste / drag-and-drop** a YouTube or Instagram URL into the window.
 - **Analyze** before download — preview title, channel, length and thumbnail before committing.
 - Choose **MP3** (audio) or **MP4** (video) output.
-- **Quality picker** for MP4 (Best / 1080p / 720p / 480p / 360p).
+- **Quality picker** for YouTube MP4 (Best / 1080p / 720p / 480p / 360p).
 - **Trim video** — set start / end timestamps before export (`m:ss` or `h:mm:ss`).
 - **Save As** dialog — pick destination and filename freely; last used folder is remembered.
 - **Show folder** button — opens the destination folder in Explorer.
@@ -43,7 +43,7 @@ This tool is published under the [MIT License](LICENSE), which explicitly discla
 Grab the latest release from <https://github.com/fetmamm/Youtube_converter/releases>:
 
 - **`.msi`** — Windows installer. Adds Start menu and desktop shortcuts, registers in *Add/Remove Programs*, and **launches the app automatically on first install**. Major upgrades silently replace the previous version.
-- **`.zip`** — Portable build. Extract and run `YoutubeConverter.exe` directly.
+- **`.zip`** — Portable build. Extract and run `MediaConverter.exe` directly.
 
 ## Versioning & releases
 
@@ -55,8 +55,8 @@ The version number lives in the [`VERSION`](VERSION) file at repo root (format `
 2. GitHub Actions ([release.yml](.github/workflows/release.yml)) automatically:
    - Builds a self-contained Windows x64 binary.
    - Downloads FFmpeg.
-   - Produces `YoutubeConverter-v{version}-win-x64.zip` (portable).
-   - Produces `YoutubeConverter-v{version}-win-x64.msi` (installer via WiX 5).
+   - Produces `MediaConverter-v{version}-win-x64.zip` (portable).
+   - Produces `MediaConverter-v{version}-win-x64.msi` (installer via WiX 5).
    - Publishes a GitHub release tagged `v{version}` with both files attached.
 
 The app displays its own version next to the title and checks GitHub on startup. If a newer release exists, a yellow **Updates** button highlights it.
@@ -92,7 +92,7 @@ dotnet run -c Release
 .\Publish.ps1
 ```
 
-Output lands in `dist/YoutubeConverter.exe` — self-contained, no .NET runtime required on the target machine.
+Output lands in `dist/MediaConverter.exe` — self-contained, no .NET runtime required on the target machine.
 
 ## Project structure
 
@@ -140,7 +140,7 @@ Output lands in `dist/YoutubeConverter.exe` — self-contained, no .NET runtime 
     └── Helpers/PathHelpers.cs                 # SanitizeFileName, FormatDuration
 ```
 
-User data (history, settings) is stored in `%APPDATA%\YoutubeConverter\settings.json`.
+User data (history, settings) is stored in `%APPDATA%\MediaConverter\settings.json`.
 
 ## Libraries
 

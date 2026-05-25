@@ -79,6 +79,8 @@ public partial class MainViewModel : ObservableObject
         _previewCts?.Cancel();
         ClearPreview();
         Url = string.Empty;
+        IsMp3 = IsYoutubeSelected;
+        IsMp4 = IsInstagramSelected;
         StatusText = IsInstagramSelected ? Strings.InstagramReadyPrompt : Strings.ReadyPrompt;
         AnalyzeCommand.NotifyCanExecuteChanged();
         ExportCommand.NotifyCanExecuteChanged();

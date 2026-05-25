@@ -77,7 +77,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.version }}"
-          $zipName = "YoutubeConverter-v$version-win-x64.zip"
+          $zipName = "MediaConverter-v$version-win-x64.zip"
           Compress-Archive -Path publish\* -DestinationPath $zipName -Force
           Write-Host "Created $zipName"
 
@@ -91,7 +91,7 @@ jobs:
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.version }}"
-          $msiName = "YoutubeConverter-v$version-win-x64.msi"
+          $msiName = "MediaConverter-v$version-win-x64.msi"
           wix build installer\Product.wxs `
             -arch x64 `
             -d Version="$version" `
@@ -107,8 +107,8 @@ jobs:
         run: |
           $version = "${{ steps.version.outputs.version }}"
           $tag = "${{ steps.version.outputs.tag }}"
-          $zip = "YoutubeConverter-v$version-win-x64.zip"
-          $msi = "YoutubeConverter-v$version-win-x64.msi"
+          $zip = "MediaConverter-v$version-win-x64.zip"
+          $msi = "MediaConverter-v$version-win-x64.msi"
           gh release create $tag $zip $msi `
             --title "$tag" `
-            --notes "Automatic release for version $version.`n`n**Installation:**`n- ``.msi`` — Double-click to install (Start menu + desktop shortcut).`n- ``.zip`` — Extract and run ``YoutubeConverter.exe`` directly (portable)."
+            --notes "Automatic release for version $version.`n`n**Installation:**`n- ``.msi`` — Double-click to install (Start menu + desktop shortcut).`n- ``.zip`` — Extract and run ``MediaConverter.exe`` directly (portable)."

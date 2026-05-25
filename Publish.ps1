@@ -1,4 +1,4 @@
-# Packages YoutubeConverter as a self-contained Windows app.
+# Packages Media Converter as a self-contained Windows app.
 # Result: a single .exe + ffmpeg folder that can be copied to any Win10/11 machine.
 
 $ErrorActionPreference = 'Stop'
@@ -21,4 +21,4 @@ if ($LASTEXITCODE -ne 0) { throw 'Publish failed.' }
 
 Write-Host ''
 Write-Host "Done! The app is in: $publishDir" -ForegroundColor Green
-Write-Host '   Double-click YoutubeConverter.exe to run.'
+Write-Host '   Double-click MediaConverter.exe to run.'

@@ -10,15 +10,20 @@ public static class SettingsService
 
     private static readonly string Dir = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "YoutubeConverter");
+        "MediaConverter");
     private static readonly string File = Path.Combine(Dir, "settings.json");
+    private static readonly string LegacyFile = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "YoutubeConverter",
+        "settings.json");
 
     public static AppSettings Load()
     {
         try
         {
-            if (!System.IO.File.Exists(File)) return new AppSettings();
-            var json = System.IO.File.ReadAllText(File);
+            var file = System.IO.File.Exists(File) ? File : LegacyFile;
+            if (!System.IO.File.Exists(file)) return new AppSettings();
+            var json = System.IO.File.ReadAllText(file);
             return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
         }
         catch
