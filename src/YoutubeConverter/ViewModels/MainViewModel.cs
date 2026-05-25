@@ -11,6 +11,7 @@ public partial class MainViewModel : ObservableObject
     private readonly YoutubeDownloadService _youtubeService = new();
     private readonly InstagramDownloadService _instagramService = new();
     private readonly AppSettings _settings = SettingsService.Load();
+    private bool _keepUrlOnPlatformChange;
 
     public ObservableCollection<string> Qualities { get; } = new(YoutubeDownloadService.Qualities);
 
@@ -70,6 +71,20 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnUrlChanged(string value)
     {
+        var detectedPlatform = DetectPlatform(value);
+        if (detectedPlatform.HasValue && detectedPlatform.Value != SelectedPlatform)
+        {
+            _keepUrlOnPlatformChange = true;
+            try
+            {
+                SelectedPlatform = detectedPlatform.Value;
+            }
+            finally
+            {
+                _keepUrlOnPlatformChange = false;
+            }
+        }
+
         ClearPreview();
         AnalyzeCommand.NotifyCanExecuteChanged();
     }
@@ -78,7 +93,8 @@ public partial class MainViewModel : ObservableObject
     {
         _previewCts?.Cancel();
         ClearPreview();
-        Url = string.Empty;
+        if (!_keepUrlOnPlatformChange)
+            Url = string.Empty;
         IsMp3 = IsYoutubeSelected;
         IsMp4 = IsInstagramSelected;
         StatusText = IsInstagramSelected ? Strings.InstagramReadyPrompt : Strings.ReadyPrompt;
@@ -121,5 +137,26 @@ public partial class MainViewModel : ObservableObject
     {
         HasPreview = false;
         PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
+    }
+
+    private static DownloadPlatform? DetectPlatform(string value)
+    {
+        if (!Uri.TryCreate(value.Trim(), UriKind.Absolute, out var uri))
+            return null;
+
+        if (uri.Host.Equals("youtu.be", StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.Equals("youtube.com", StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.EndsWith(".youtube.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return DownloadPlatform.Youtube;
+        }
+
+        if (uri.Host.Equals("instagram.com", StringComparison.OrdinalIgnoreCase) ||
+            uri.Host.EndsWith(".instagram.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return DownloadPlatform.Instagram;
+        }
+
+        return null;
     }
 }

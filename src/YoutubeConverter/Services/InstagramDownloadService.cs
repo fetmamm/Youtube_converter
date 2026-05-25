@@ -93,6 +93,9 @@ public sealed class InstagramDownloadService
                 ? new[]
                 {
                     "--newline",
+                    "--progress",
+                    "--progress-delta",
+                    "0.2",
                     "--no-playlist",
                     "--no-warnings",
                     "--extract-audio",
@@ -109,10 +112,13 @@ public sealed class InstagramDownloadService
                 : new[]
                 {
                     "--newline",
+                    "--progress",
+                    "--progress-delta",
+                    "0.2",
                     "--no-playlist",
                     "--no-warnings",
                     "--format",
-                    "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best",
+                    "bv*+ba/b",
                     "--merge-output-format",
                     "mp4",
                     "--ffmpeg-location",
@@ -187,8 +193,8 @@ public sealed class InstagramDownloadService
         try
         {
             using var process = Process.Start(psi) ?? throw new InvalidOperationException("Could not start yt-dlp.");
-            var stdoutTask = process.StandardOutput.ReadToEndAsync(ct);
-            var stderrTask = ReadStderrAsync(process, progress, ct);
+            var stdoutTask = ReadOutputAsync(process.StandardOutput, progress, ct);
+            var stderrTask = ReadOutputAsync(process.StandardError, progress, ct);
 
             await process.WaitForExitAsync(ct);
             var stdout = await stdoutTask;
@@ -205,14 +211,14 @@ public sealed class InstagramDownloadService
         }
     }
 
-    private static async Task<string> ReadStderrAsync(Process process, IProgress<double>? progress, CancellationToken ct)
+    private static async Task<string> ReadOutputAsync(TextReader reader, IProgress<double>? progress, CancellationToken ct)
     {
-        var stderr = new List<string>();
-        while (!process.StandardError.EndOfStream)
+        var lines = new List<string>();
+        while (true)
         {
-            var line = await process.StandardError.ReadLineAsync(ct);
+            var line = await reader.ReadLineAsync(ct);
             if (line == null) break;
-            stderr.Add(line);
+            lines.Add(line);
 
             var match = ProgressRegex.Match(line);
             if (match.Success &&
@@ -220,9 +226,15 @@ public sealed class InstagramDownloadService
             {
                 progress?.Report(Math.Clamp(percent / 100.0, 0, 1));
             }
+            else if (line.StartsWith("[Merger]", StringComparison.OrdinalIgnoreCase) ||
+                     line.StartsWith("[ExtractAudio]", StringComparison.OrdinalIgnoreCase) ||
+                     line.StartsWith("[VideoConvertor]", StringComparison.OrdinalIgnoreCase))
+            {
+                progress?.Report(0.95);
+            }
         }
 
-        return string.Join(Environment.NewLine, stderr);
+        return string.Join(Environment.NewLine, lines);
     }
 
     private static string GetFriendlyError(string stderr)

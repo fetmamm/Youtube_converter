@@ -41,6 +41,7 @@ public partial class MainViewModel
         IsBusy = true;
         Progress = 0;
         HasLastFile = false;
+        string? overwriteTempFile = null;
 
         try
         {
@@ -55,6 +56,7 @@ public partial class MainViewModel
                 DefaultExt = ext,
                 AddExtension = true,
                 Filter = isAudio ? Strings.Mp3FilterText : Strings.Mp4FilterText,
+                OverwritePrompt = true,
                 Title = Strings.SaveAsDialogTitle
             };
             if (!string.IsNullOrEmpty(_settings.LastFolder) && Directory.Exists(_settings.LastFolder))
@@ -66,13 +68,23 @@ public partial class MainViewModel
                 return;
             }
 
-            _settings.LastFolder = Path.GetDirectoryName(dialog.FileName);
+            var finalFileName = dialog.FileName;
+            var downloadFileName = finalFileName;
+            if (File.Exists(finalFileName))
+            {
+                var dir = Path.GetDirectoryName(finalFileName) ?? Path.GetTempPath();
+                overwriteTempFile = Path.Combine(dir, $"_overwrite_{Guid.NewGuid():N}.{ext}");
+                downloadFileName = overwriteTempFile;
+            }
+
+            _settings.LastFolder = Path.GetDirectoryName(finalFileName);
             SettingsService.Save(_settings);
 
             var progress = new Progress<double>(p =>
             {
                 Progress = p;
-                StatusText = string.Format(Strings.DownloadingProgressFmt, p * 100);
+                if (p < 1)
+                    StatusText = string.Format(Strings.DownloadingProgressFmt, p * 100);
             });
 
             TimeSpan? trimStart = null, trimEnd = null;
@@ -90,23 +102,30 @@ public partial class MainViewModel
             StatusText = TrimEnabled ? Strings.DownloadingAndTrimming : Strings.Downloading;
             if (isInstagram)
             {
-                await _instagramService.DownloadAsync(url, dialog.FileName, isAudio, trimStart, trimEnd, progress, _downloadCts.Token);
+                await _instagramService.DownloadAsync(url, downloadFileName, isAudio, trimStart, trimEnd, progress, _downloadCts.Token);
             }
             else
             {
-                await _youtubeService.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
+                await _youtubeService.DownloadAsync(url, downloadFileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
+            }
+
+            if (overwriteTempFile != null)
+            {
+                File.Copy(overwriteTempFile, finalFileName, true);
+                File.Delete(overwriteTempFile);
+                overwriteTempFile = null;
             }
 
             Progress = 1;
-            _lastSavedFile = dialog.FileName;
+            _lastSavedFile = finalFileName;
             HasLastFile = true;
-            StatusText = string.Format(Strings.DoneSavedFmt, Path.GetFileName(dialog.FileName));
+            StatusText = string.Format(Strings.DoneSavedFmt, Path.GetFileName(finalFileName));
 
             AddToHistory(new HistoryEntry
             {
                 Title = title,
                 Url = url,
-                FilePath = dialog.FileName,
+                FilePath = finalFileName,
                 Format = ext.ToUpperInvariant(),
                 Platform = isInstagram ? DownloadPlatform.Instagram : DownloadPlatform.Youtube,
                 Timestamp = DateTime.Now
@@ -123,6 +142,10 @@ public partial class MainViewModel
         }
         finally
         {
+            if (overwriteTempFile != null && File.Exists(overwriteTempFile))
+            {
+                try { File.Delete(overwriteTempFile); } catch { }
+            }
             IsBusy = false;
             _downloadCts?.Dispose();
             _downloadCts = null;
