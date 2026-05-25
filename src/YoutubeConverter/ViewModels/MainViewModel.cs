@@ -8,7 +8,8 @@ namespace YoutubeConverter.ViewModels;
 
 public partial class MainViewModel : ObservableObject
 {
-    private readonly YoutubeDownloadService _service = new();
+    private readonly YoutubeDownloadService _youtubeService = new();
+    private readonly InstagramDownloadService _instagramService = new();
     private readonly AppSettings _settings = SettingsService.Load();
 
     public ObservableCollection<string> Qualities { get; } = new(YoutubeDownloadService.Qualities);
@@ -41,7 +42,21 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _selectedQuality = Strings.DefaultQuality;
 
-    public bool ShowQualityPicker => IsMp4;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsYoutubeSelected))]
+    [NotifyPropertyChangedFor(nameof(IsInstagramSelected))]
+    [NotifyPropertyChangedFor(nameof(ShowFormatPicker))]
+    [NotifyPropertyChangedFor(nameof(ShowQualityPicker))]
+    [NotifyPropertyChangedFor(nameof(UrlPlaceholder))]
+    private DownloadPlatform _selectedPlatform = DownloadPlatform.Youtube;
+
+    public bool IsYoutubeSelected => SelectedPlatform == DownloadPlatform.Youtube;
+    public bool IsInstagramSelected => SelectedPlatform == DownloadPlatform.Instagram;
+    public bool ShowFormatPicker => true;
+    public bool ShowQualityPicker => IsYoutubeSelected && IsMp4;
+    public string UrlPlaceholder => IsInstagramSelected
+        ? Strings.InstagramUrlPlaceholder
+        : Strings.YoutubeUrlPlaceholder;
 
     public MainViewModel()
     {
@@ -55,9 +70,18 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnUrlChanged(string value)
     {
-        HasPreview = false;
-        PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
+        ClearPreview();
         AnalyzeCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSelectedPlatformChanged(DownloadPlatform value)
+    {
+        _previewCts?.Cancel();
+        ClearPreview();
+        Url = string.Empty;
+        StatusText = IsInstagramSelected ? Strings.InstagramReadyPrompt : Strings.ReadyPrompt;
+        AnalyzeCommand.NotifyCanExecuteChanged();
+        ExportCommand.NotifyCanExecuteChanged();
     }
 
     partial void OnSelectedQualityChanged(string value)
@@ -79,9 +103,21 @@ public partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(ShowQualityPicker));
     }
 
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void SelectYoutube() => SelectedPlatform = DownloadPlatform.Youtube;
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void SelectInstagram() => SelectedPlatform = DownloadPlatform.Instagram;
+
     public void HandleDroppedText(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) return;
         Url = text.Trim();
+    }
+
+    private void ClearPreview()
+    {
+        HasPreview = false;
+        PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
     }
 }

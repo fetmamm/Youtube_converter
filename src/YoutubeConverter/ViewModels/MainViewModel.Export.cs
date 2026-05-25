@@ -33,6 +33,7 @@ public partial class MainViewModel
     private async Task ExportAsync()
     {
         var url = Url.Trim();
+        var isInstagram = IsInstagramSelected;
         var isAudio = IsMp3;
         var ext = isAudio ? "mp3" : "mp4";
 
@@ -43,7 +44,9 @@ public partial class MainViewModel
 
         try
         {
-            var title = PreviewTitle ?? await _service.GetVideoTitleAsync(url, _downloadCts.Token);
+            var title = PreviewTitle ?? (isInstagram
+                ? await _instagramService.GetVideoTitleAsync(url, _downloadCts.Token)
+                : await _youtubeService.GetVideoTitleAsync(url, _downloadCts.Token));
             var safeName = PathHelpers.SanitizeFileName(title);
 
             var dialog = new SaveFileDialog
@@ -85,7 +88,14 @@ public partial class MainViewModel
             }
 
             StatusText = TrimEnabled ? Strings.DownloadingAndTrimming : Strings.Downloading;
-            await _service.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
+            if (isInstagram)
+            {
+                await _instagramService.DownloadAsync(url, dialog.FileName, isAudio, trimStart, trimEnd, progress, _downloadCts.Token);
+            }
+            else
+            {
+                await _youtubeService.DownloadAsync(url, dialog.FileName, isAudio, SelectedQuality, trimStart, trimEnd, progress, _downloadCts.Token);
+            }
 
             Progress = 1;
             _lastSavedFile = dialog.FileName;

@@ -21,6 +21,11 @@
             <File Source="$(var.PublishDir)\ffmpeg\ffmpeg.exe" KeyPath="yes" />
           </Component>
         </Directory>
+        <Directory Id="YtDlpDir" Name="yt-dlp">
+          <Component Id="YtDlpComp">
+            <File Source="$(var.PublishDir)\yt-dlp\yt-dlp.exe" KeyPath="yes" />
+          </Component>
+        </Directory>
         <Component Id="MainExeComp">
           <File Id="MainExe"
                 Source="$(var.PublishDir)\YoutubeConverter.exe"
@@ -63,6 +68,7 @@
     <Feature Id="Main" Title="YouTube Converter" Level="1">
       <ComponentRef Id="MainExeComp" />
       <ComponentRef Id="FfmpegComp" />
+      <ComponentRef Id="YtDlpComp" />
       <ComponentRef Id="StartMenuShortcut" />
       <ComponentRef Id="DesktopShortcut" />
     </Feature>

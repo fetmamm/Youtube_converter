@@ -4,6 +4,9 @@ internal static class Strings
 {
     // Initial status
     public const string ReadyPrompt = "Ready. Paste or drop a YouTube link.";
+    public const string InstagramReadyPrompt = "Ready. Paste or drop an Instagram video or reel link.";
+    public const string YoutubeUrlPlaceholder = "Paste YouTube link here...";
+    public const string InstagramUrlPlaceholder = "Paste Instagram video or reel link here...";
 
     // Analyze flow
     public const string AnalyzingVideo = "Analyzing video…";

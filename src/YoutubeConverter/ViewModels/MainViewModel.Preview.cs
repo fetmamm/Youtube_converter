@@ -34,13 +34,14 @@ public partial class MainViewModel
         _previewCts?.Cancel();
         var cts = _previewCts = new CancellationTokenSource();
 
-        HasPreview = false;
-        PreviewTitle = PreviewAuthor = PreviewDuration = PreviewThumbnail = null;
+        ClearPreview();
         StatusText = Strings.AnalyzingVideo;
 
         try
         {
-            var preview = await _service.GetPreviewAsync(url, cts.Token);
+            var preview = IsInstagramSelected
+                ? await _instagramService.GetPreviewAsync(url, cts.Token)
+                : await _youtubeService.GetPreviewAsync(url, cts.Token);
             if (cts.IsCancellationRequested) return;
 
             PreviewTitle = preview.Title;

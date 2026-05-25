@@ -43,6 +43,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Header: title + toolbar buttons + popups -->
@@ -128,15 +129,50 @@
                 </Popup>
             </Grid>
 
+            <!-- Platform mode -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
+                <ui:Button Content="YouTube"
+                           Icon="{ui:SymbolIcon Symbol=PlayCircle24}"
+                           ToolTip="YouTube mode"
+                           Command="{Binding SelectYoutubeCommand}"
+                           Margin="0,0,8,0">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsYoutubeSelected}" Value="True">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+                <ui:Button Content="Instagram"
+                           Icon="{ui:SymbolIcon Symbol=Camera24}"
+                           ToolTip="Instagram mode"
+                           Command="{Binding SelectInstagramCommand}">
+                    <ui:Button.Style>
+                        <Style TargetType="ui:Button" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <Setter Property="Appearance" Value="Secondary" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsInstagramSelected}" Value="True">
+                                    <Setter Property="Appearance" Value="Primary" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:Button.Style>
+                </ui:Button>
+            </StackPanel>
+
             <!-- URL input + Analyze -->
-            <Grid Grid.Row="1" Margin="0,0,0,12">
+            <Grid Grid.Row="2" Margin="0,0,0,12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <ui:TextBox Grid.Column="0"
-                            PlaceholderText="Paste YouTube link here…"
+                            PlaceholderText="{Binding UrlPlaceholder}"
                             Text="{Binding Url, UpdateSourceTrigger=PropertyChanged}"
                             IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
                     <ui:TextBox.Style>
@@ -168,7 +204,7 @@
             </Grid>
 
             <!-- Preview card -->
-            <Border Grid.Row="2"
+            <Border Grid.Row="3"
                     Background="{DynamicResource ControlFillColorDefaultBrush}"
                     CornerRadius="8"
                     Padding="12"
@@ -193,7 +229,8 @@
             </Border>
 
             <!-- Format + Quality -->
-            <Grid Grid.Row="3" Margin="0,0,0,12">
+            <Grid Grid.Row="4" Margin="0,0,0,12"
+                  Visibility="{Binding ShowFormatPicker, Converter={StaticResource BoolToVisibilityConverter}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -216,7 +253,7 @@
             </Grid>
 
             <!-- Trim section -->
-            <StackPanel Grid.Row="4" Margin="0,0,0,12"
+            <StackPanel Grid.Row="5" Margin="0,0,0,12"
                         Visibility="{Binding HasPreview, Converter={StaticResource BoolToVisibilityConverter}}">
                 <CheckBox Content="Trim video" IsChecked="{Binding TrimEnabled}" />
                 <Grid Margin="24,8,0,0"
@@ -241,7 +278,7 @@
             </StackPanel>
 
             <!-- Action buttons -->
-            <StackPanel Grid.Row="5" Orientation="Horizontal">
+            <StackPanel Grid.Row="6" Orientation="Horizontal">
                 <ui:Button Content="Export…"
                            Padding="20,8"
                            Command="{Binding ExportCommand}">
@@ -269,14 +306,14 @@
             </StackPanel>
 
             <!-- Progress + status -->
-            <ProgressBar Grid.Row="6"
+            <ProgressBar Grid.Row="7"
                          Margin="0,16,0,8"
                          Height="6"
                          Minimum="0" Maximum="1"
                          Value="{Binding Progress}"
                          Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <ui:TextBlock Grid.Row="7"
+            <ui:TextBlock Grid.Row="8"
                           Text="{Binding StatusText}"
                           FontTypography="Caption"
                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
